@@ -15,5 +15,5 @@ int main(){
 		{0,1,0},
 		{1,0,0}
 	};
-	std::cout<<b*a<<"\n";
+	std::cout<<a+b<<"\n";
 }

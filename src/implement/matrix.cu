@@ -104,18 +104,17 @@ namespace LibMatchstick{
 		size_t w
 	){
 		size_t i=blockIdx.x+blockDim.x+threadIdx.x;
-		size_t j=blockIdx.y+blockDim.y+threadIdx.y;
-		if(i<h&&j<w)
-			res[flatten_index(i,j,w)]=
-				left[flatten_index(i,j,w)]+
-				right[flatten_index(i,j,w)];
+		if(i<h*w)
+			res[i]=
+				left[i]+
+				right[i];
 	}
 
 	Matrix Matrix::operator+(const Matrix&a)const{
 		Matrix res;
 		if(this->h==a.h&&this->w==a.w){
 			res.resize(a.h,a.w);
-			size_t bs=512;
+			size_t bs=256;
 			size_t gs=(a.h*a.w+bs-1)/bs;
 			scalor_add<<<gs,bs>>>(res.data,data,a.data,h,w);
 		}
@@ -130,18 +129,17 @@ namespace LibMatchstick{
 		size_t w
 	){
 		size_t i=blockIdx.x+blockDim.x+threadIdx.x;
-		size_t j=blockIdx.y+blockDim.y+threadIdx.y;
-		if(i<h&&j<w)
-			res[flatten_index(i,j,w)]=
-				left[flatten_index(i,j,w)]-
-				right[flatten_index(i,j,w)];
+		if(i<h*w)
+			res[i]=
+				left[i]-
+				right[i];
 	}
 
 	Matrix Matrix::operator-(const Matrix&a)const{
 		Matrix res;
 		if(this->h==a.h&&this->w==a.w){
 			res.resize(a.h,a.w);
-			size_t bs=512;
+			size_t bs=256;
 			size_t gs=(a.h*a.w+bs-1)/bs;
 			scalor_sub<<<gs,bs>>>(res.data,data,a.data,h,w);
 		}
@@ -150,7 +148,7 @@ namespace LibMatchstick{
 
 	Matrix&Matrix::operator+=(const Matrix&a){
 		if(this->h==a.h&&this->w==a.w){
-			size_t bs=512;
+			size_t bs=256;
 			size_t gs=(a.h*a.w+bs-1)/bs;
 			scalor_add<<<gs,bs>>>(data,data,a.data,h,w);
 		}
@@ -159,7 +157,7 @@ namespace LibMatchstick{
 
 	Matrix&Matrix::operator-=(const Matrix&a){
 		if(this->h==a.h&&this->w==a.w){
-			size_t bs=512;
+			size_t bs=256;
 			size_t gs=(a.h*a.w+bs-1)/bs;
 			scalor_sub<<<gs,bs>>>(data,data,a.data,h,w);
 		}
@@ -174,18 +172,17 @@ namespace LibMatchstick{
 		size_t w
 	){
 		size_t i=blockIdx.x+blockDim.x+threadIdx.x;
-		size_t j=blockIdx.y+blockDim.y+threadIdx.y;
-		if(i<h&&j<w)
-			res[flatten_index(i,j,w)]=
-				left[flatten_index(i,j,w)]*
-				right[flatten_index(i,j,w)];
+		if(i<h*w)
+			res[i]=
+				left[i]*
+				right[i];
 	}
 
 	Matrix Matrix::hadamard(const Matrix&a)const{
 		Matrix res;
 		if(this->h==a.h&&this->w==a.w){
 			res.resize(a.h,a.w);
-			size_t bs=512;
+			size_t bs=256;
 			size_t gs=(a.h*a.w+bs-1)/bs;
 			scalor_sub<<<gs,bs>>>(res.data,data,a.data,h,w);
 		}
@@ -215,7 +212,7 @@ namespace LibMatchstick{
 		Matrix res;
 		if(this->w==a.h){
 			res.resize(this->h,a.w);
-			size_t bs=512;
+			size_t bs=256;
 			size_t gs=(a.h*a.w+bs-1)/bs;
 			vector_dot<<<gs,bs>>>(res.data,data,a.data,res.h,res.w,this->w);
 		}
