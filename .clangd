@@ -1,0 +1,19 @@
+If:
+  PathMatch: .*\.cuh
+CompileFlags:
+  Compiler: clang++
+  Add:
+    - -x
+    - cuda
+    - -std=c++17
+    - -nocudalib
+---
+If:
+  PathMatch: .*\.cu
+CompileFlags:
+  Compiler: clang++
+  Add:
+    - -x
+    - cuda
+    - -std=c++17
+    - -nocudalib

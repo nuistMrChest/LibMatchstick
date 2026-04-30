@@ -18,8 +18,6 @@ namespace LibMatchstick{
 		friend std::ostream&operator<<(std::ostream&os,const Matrix&a);
 		size_t getHeight()const;
 		size_t getWidth()const;
-		float&operator()(size_t i,size_t j);
-		float&operator()(size_t i,size_t j)const;
 		void resize(size_t h,size_t w);
 		Matrix(const Matrix&a);
 		Matrix&operator=(const Matrix&a);
@@ -29,6 +27,8 @@ namespace LibMatchstick{
 		Matrix&operator-=(const Matrix&a);
 		Matrix hadamard(const Matrix&a)const;
 		Matrix operator*(const Matrix&a)const;
+		void set(size_t i,size_t j,float v);
+		float get(size_t i,size_t j)const;
 	};
 }
 

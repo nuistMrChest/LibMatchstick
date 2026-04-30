@@ -59,20 +59,12 @@ namespace LibMatchstick{
 		return w;
 	}
 
-	float&Matrix::operator()(size_t i,size_t j){
-		return data[i*w+j];
-	}
-
-	float&Matrix::operator()(size_t i,size_t j)const{
-		return data[i*w+j];
-	}
-
 	void Matrix::resize(size_t h,size_t w){
 		this->w=w;
 		this->h=h;
 		float*tmp;
 		cudaMalloc(&tmp,h*w*sizeof(float));
-		cudaMemcpy(tmp,data,h*w*sizeof(float),cudaMemcpyDeviceToDevice);
+		if(data!=nullptr)cudaMemcpy(tmp,data,h*w*sizeof(float),cudaMemcpyDeviceToDevice);
 		cudaFree(data);
 		data=tmp;
 	}
@@ -85,10 +77,13 @@ namespace LibMatchstick{
 	}
 
 	Matrix&Matrix::operator=(const Matrix&a){
-		this->w=a.w;
-		this->h=a.h;
-		cudaMalloc(&this->data,w*h*sizeof(float));
-		cudaMemcpy(this->data,a.data,w*h*sizeof(float),cudaMemcpyDeviceToDevice);
+		if(this!=&a){
+			this->w=a.w;
+			this->h=a.h;
+			cudaFree(this->data);
+			cudaMalloc(&this->data,w*h*sizeof(float));
+			cudaMemcpy(this->data,a.data,w*h*sizeof(float),cudaMemcpyDeviceToDevice);
+		}
 		return*this;
 	}
 
@@ -103,7 +98,7 @@ namespace LibMatchstick{
 		size_t h,
 		size_t w
 	){
-		size_t i=blockIdx.x+blockDim.x+threadIdx.x;
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		if(i<h*w)
 			res[i]=
 				left[i]+
@@ -128,7 +123,7 @@ namespace LibMatchstick{
 		size_t h,
 		size_t w
 	){
-		size_t i=blockIdx.x+blockDim.x+threadIdx.x;
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		if(i<h*w)
 			res[i]=
 				left[i]-
@@ -171,7 +166,7 @@ namespace LibMatchstick{
 		size_t h,
 		size_t w
 	){
-		size_t i=blockIdx.x+blockDim.x+threadIdx.x;
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		if(i<h*w)
 			res[i]=
 				left[i]*
@@ -184,7 +179,7 @@ namespace LibMatchstick{
 			res.resize(a.h,a.w);
 			size_t bs=256;
 			size_t gs=(a.h*a.w+bs-1)/bs;
-			scalor_sub<<<gs,bs>>>(res.data,data,a.data,h,w);
+			scalor_mul<<<gs,bs>>>(res.data,data,a.data,h,w);
 		}
 		return res;
 	}
@@ -212,10 +207,25 @@ namespace LibMatchstick{
 		Matrix res;
 		if(this->w==a.h){
 			res.resize(this->h,a.w);
-			size_t bs=256;
-			size_t gs=(a.h*a.w+bs-1)/bs;
-			vector_dot<<<gs,bs>>>(res.data,data,a.data,res.h,res.w,this->w);
+			dim3 block(16,16);
+			dim3 grid(
+				(res.h+block.x-1)/block.x,
+				(res.w+block.y-1)/block.y
+			);
+			vector_dot<<<grid,block>>>(res.data,data,a.data,res.h,res.w,this->w);
 		}
 		return res;
+	}
+
+	void Matrix::set(size_t i,size_t j,float v){
+		if(i<h&&j<w)
+			cudaMemcpy(data+i*w+j,&v,sizeof(float),cudaMemcpyHostToDevice);
+	}
+
+	float Matrix::get(size_t i,size_t j)const{
+		float tmp=0;
+		if(i<h&&j<w)
+			cudaMemcpy(&tmp,data+i*w+j,sizeof(float),cudaMemcpyDeviceToHost);
+		return tmp;
 	}
 }
