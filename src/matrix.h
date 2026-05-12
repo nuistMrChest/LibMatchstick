@@ -29,6 +29,7 @@ namespace LibMatchstick{
 		Matrix operator*(const Matrix&a)const;
 		void set(size_t i,size_t j,float v);
 		float get(size_t i,size_t j)const;
+		float*getData();
 	};
 }
 

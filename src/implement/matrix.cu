@@ -228,4 +228,8 @@ namespace LibMatchstick{
 			cudaMemcpy(&tmp,data+i*w+j,sizeof(float),cudaMemcpyDeviceToHost);
 		return tmp;
 	}
+
+	float*Matrix::getData(){
+		return data;
+	}
 }

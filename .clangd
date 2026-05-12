@@ -1,19 +1,7 @@
-If:
-  PathMatch: .*\.cuh
 CompileFlags:
   Compiler: clang++
   Add:
-    - -x
-    - cuda
-    - -std=c++17
+    - --cuda-path=/home/mrchest/.local/cuda-13.2
+    - --cuda-gpu-arch=sm_120
     - -nocudalib
----
-If:
-  PathMatch: .*\.cu
-CompileFlags:
-  Compiler: clang++
-  Add:
-    - -x
-    - cuda
     - -std=c++17
-    - -nocudalib
