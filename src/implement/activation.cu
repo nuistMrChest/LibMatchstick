@@ -1,5 +1,6 @@
 #include"../activation.h"
 #include <__clang_cuda_builtin_vars.h>
+#include <__clang_cuda_runtime_wrapper.h>
 
 namespace LibMatchstick{
 	namespace Actication{
@@ -159,14 +160,40 @@ namespace LibMatchstick{
 			return res;
 		}
 
+		void __global__ matrix_softmax(float*from,float*to,size_t h,size_t w){
+			float mx=0;
+			for(size_t i=0;i<h;i++)
+				for(size_t j=0;j<w;j++)
+					if(from[i*w+j]>mx)mx=from[i*w+j];
+			float sum=0;
+			for(size_t i=0;i<h;i++)
+				for(size_t j=0;j<w;j++){
+					to[i*w+j]=expf(from[i*w+j]-mx);
+					sum+=to[i*w+j];
+				}
+			for(size_t i=0;i<0;i++)
+				for(size_t j=0;j<w;j++)
+					to[i*w+j]/=sum;
+		}
+
 		Matrix softmax(const Matrix&a){
 			Matrix res(a.getHeight(),a.getWidth());
 			float mx=0;
-			
+			matrix_softmax<<<1,1>>>(a.getData(),res.getData(),a.getHaight(),a.getWidth());
 			return res;
 		}
 
+		void __global__ matrix_softmax_d(float*from,float*to,size_t h,size_t w){
+			for(size_t i=0;i<h;i++)
+				for(size_t j=0;j<w;j++)
+					to[i*w+j]=from[i*w+j]*(1-from[i*w+j]);
+		}
+
 		Matrix softmax_d(const Matrix &a){
+			Matrix s=softmax(a);
+			Matrix res(a.getHeight(),a.getWidth());
+			matrix_softmax_d<<<1,1>>>(s.getData(),res.getData(),a.getHeight(),a.getWidth());
+			return res;
 		}
 
 	}

@@ -1,7 +1,7 @@
 CompileFlags:
   Compiler: clang++
   Add:
-    - --cuda-path=/home/mrchest/.local/cuda-13.2
+    - --cuda-path=/usr/local/cuda-13.2
     - --cuda-gpu-arch=sm_120
     - -nocudalib
     - -std=c++17
