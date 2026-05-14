@@ -1,5 +1,7 @@
 #include<iostream>
 #include"src/matrix.h"
+#include"src/activation.h"
+#include"src/layer.h"
 
 using namespace LibMatchstick;
 

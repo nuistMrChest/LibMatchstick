@@ -62,7 +62,7 @@ namespace LibMatchstick{
 				(res.getWidth()+block.y-1)/block.y
 			);
 			float scale=1/(x.getHeight()*x.getWidth());
-			scalor_MAE_d<<<block,grid>>>(scale,x.getData(),e.getData(),x.getHeight(),x.getWidth());
+			scalor_MAE_d<<<grid,block>>>(scale,x.getData(),e.getData(),x.getHeight(),x.getWidth());
 			return res;
 		}
 
@@ -107,7 +107,7 @@ namespace LibMatchstick{
 				(res.getHeight()+block.x-1)/block.x,
 				(res.getWidth()+block.y-1)/block.y
 			);
-			scalor_cross_entropy_d<<<block,grid>>>(x,getData,e.getData,e,res.getData,x.getHeight(),y.getHeight());
+			scalor_cross_entropy_d<<<grid,block>>>(x,getData,e.getData,e,res.getData,x.getHeight(),y.getHeight());
 			return res;
 		}
 	}
