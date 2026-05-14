@@ -95,8 +95,11 @@ namespace LibMatchstick{
 		void __global__ scalor_sigmoid_d(const float*from,float*to,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
-			if(i<h&&j<w)
-				to[i*w+j]=from[i*w+j]*(1-from[i*w+j]);
+			if(i<h&&j<w){
+				float x=from[i*w+j];
+				float s=1.0f/(1.0f+expf(-x));
+				to[i*w+j]=s*(1.0f-s);
+			}
 		}
 
 		Matrix sigmoid_d(const Matrix&a){
@@ -154,7 +157,7 @@ namespace LibMatchstick{
 
 		Matrix identity_d(const Matrix&a){
 			Matrix res(a.getHeight(),a.getWidth());
-			cudaMemset(res.getData(),0,a.getHeight()*a.getWidth()*sizeof(float));
+			cudaMemset(res.getData(),1,a.getHeight()*a.getWidth()*sizeof(float));
 			return res;
 		}
 
