@@ -160,6 +160,10 @@ namespace LibMatchstick{
 		}
 
 		Matrix softmax(const Matrix&a){
+			Matrix res(a.getHeight(),a.getWidth());
+			float mx=0;
+			
+			return res;
 		}
 
 		Matrix softmax_d(const Matrix &a){
