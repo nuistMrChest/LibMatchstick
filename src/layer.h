@@ -29,6 +29,10 @@ namespace LibMatchstick{
 		Matrix saveBias()const;
 		bool loadWeight(const Matrix&W);
 		bool loadBias(const Matrix&b);
+		void setActivation(
+			const std::function<Matrix(const Matrix&)>&a,
+			const std::function<Matrix(const Matrix&)>&a_d
+		);
 	};
 }
 

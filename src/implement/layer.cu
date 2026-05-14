@@ -1,5 +1,6 @@
 #include"../layer.h"
 #include"../matrix.h"
+#include"../activation.h"
 #include <memory>
 #include <random>
 
@@ -7,13 +8,17 @@ namespace LibMatchstick{
 	MLPLayer::MLPLayer():
 		sm(false),
 		in_size(0),
-		out_size(0)
+		out_size(0),
+		activation(Activation::identity),
+		activation_d(Activation::identity_d)
 	{}
 
 	MLPLayer::MLPLayer(size_t in_size,size_t out_size):
 		sm(false),
 		in_size(in_size),
-		out_size(out_size)
+		out_size(out_size),
+		activation(Activation::identity),
+		activation_d(Activation::identity_d)
 	{
 		W=std::make_unique<Matrix>(out_size,in_size);
 		b=std::make_unique<Matrix>(out_size,1);
@@ -84,4 +89,13 @@ namespace LibMatchstick{
 		}
 		return false;
 	}
+
+	void MLPLayer::setActivation(
+		const std::function<Matrix(const Matrix&)>&a,
+		const std::function<Matrix(const Matrix&)>&a_d
+	){
+		activation=a;
+		activation_d=a_d;
+	}
+
 }
