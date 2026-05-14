@@ -70,10 +70,18 @@ namespace LibMatchstick{
 	}
 
 	bool MLPLayer::loadWeight(const Matrix&W){
-		*(this->W)=W;
+		if(W.getHeight()==this->W->getHeight()&&W.getWidth()==this->W->getWidth()){
+			*(this->W)=W;
+			return true;
+		}
+		return false;
 	}
 
 	bool MLPLayer::loadBias(const Matrix&b){
-		*(this->b)=b;
+		if(b.getHeight()==this->b->getHeight()&&b.getWidth()==this->b->getWidth()){
+			*(this->b)=b;
+			return true;
+		}
+		return false;
 	}
 }

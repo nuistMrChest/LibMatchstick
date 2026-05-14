@@ -1,5 +1,4 @@
 #include"../matrix.h"
-#include <__clang_cuda_runtime_wrapper.h>
 #include <cstdlib>
 #include<cuda_runtime.h>
 #include<stdlib.h>
