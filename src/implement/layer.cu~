@@ -1,0 +1,38 @@
+#include"../layer.h"
+#include"../matrix.h"
+#include <memory>
+
+namespace LibMatchstick{
+	MLPLayer::MLPLayer():
+		sm(false),
+		in_size(0),
+		out_size(0)
+	{}
+
+	MLPLayer::MLPLayer(size_t in_size,size_t out_size):
+		sm(false),
+		in_size(in_size),
+		out_size(out_size)
+	{
+		W=std::make_unique<Matrix>(out_size,in_size);
+		b=std::make_unique<Matrix>(out_size,1);
+		last_input=std::make_unique<Matrix>(in_size,1);
+		z=std::make_unique<Matrix>(out_size,1);
+	}
+
+	Matrix MLPLayer::forward(const Matrix&input){
+		Matrix res(out_size,1);
+		*last_input=input;
+		*z=((*W*input)+*b);
+		res=activation(*z);
+		return res;
+	}
+
+	Matrix MLPLayer::backward(const Matrix&dl_da,float step){
+		Matrix res;
+		Matrix dl_dz=dl_da.hadamard(activation_d(*z));
+		res=W->transpose()*dl_dz;
+		*W-=step*(dl_dz*last_input->transpose());
+		return res;
+	}
+}

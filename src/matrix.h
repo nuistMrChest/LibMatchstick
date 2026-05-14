@@ -7,10 +7,10 @@
 
 namespace LibMatchstick{
 	class Matrix{
-		private:
+	private:
 		float*data;
 		size_t h,w;
-		public:
+	public:
 		Matrix();
 		Matrix(size_t h,size_t w);
 		Matrix(std::initializer_list<std::initializer_list<float>>a);
@@ -30,6 +30,11 @@ namespace LibMatchstick{
 		void set(size_t i,size_t j,float v);
 		float get(size_t i,size_t j)const;
 		float*getData();
+		const float*getData()const;
+		Matrix transpose()const;
+		Matrix operator*(float a)const;
+		Matrix operator*=(float a);
+		friend Matrix operator*(float a,const Matrix&b);
 	};
 }
 

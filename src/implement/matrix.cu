@@ -1,4 +1,5 @@
 #include"../matrix.h"
+#include <__clang_cuda_runtime_wrapper.h>
 #include <cstdlib>
 #include<cuda_runtime.h>
 #include<stdlib.h>
@@ -231,5 +232,67 @@ namespace LibMatchstick{
 
 	float*Matrix::getData(){
 		return data;
+	}
+
+	const float*Matrix::getData()const{
+		return data;
+	}
+
+	void __global__ scalor_transpose(const float*from,float*to,size_t h,size_t w){
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
+		if(i<h&&j<w){
+			to[j*h+i]=from[i*w+j];
+		}
+	}
+
+	Matrix Matrix::transpose()const{
+		Matrix res(w,h);
+		dim3 block(16,16);
+		dim3 grid(
+			(res.h+block.x-1)/block.x,
+			(res.w+block.y-1)/block.y
+		);
+		scalor_transpose<<<block,grid>>>(data,res.data,h,w);
+		return res;
+	}
+
+	void __global__ mul(float*res,const float*left,float right,size_t h,size_t w){
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
+		if(i<h&&j<w)
+			res[i*w+j]=left[i*w+j]*right;
+	}
+
+	Matrix Matrix::operator*(float a)const{
+		Matrix res(h,w);
+		dim3 block(16,16);
+		dim3 grid(
+			(res.h+block.x-1)/block.x,
+			(res.w+block.y-1)/block.y
+		);
+		mul<<<block,grid>>>(res.data,data,a,h,w);
+		return res;
+	}
+
+	Matrix operator*(float a,const Matrix&b){
+		return b*a;
+	}
+
+	void __global__ self_mul(float*left,float right,size_t h,size_t w){
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
+		if(i<h&&j<w)
+			left[i*w+j]*=right;
+	}
+
+	Matrix Matrix::operator*=(float a){
+		dim3 block(16,16);
+		dim3 grid(
+			(h+block.x-1)/block.x,
+			(w+block.y-1)/block.y
+		);
+		self_mul<<<block,grid>>>(data,a,h,w);
+		return*this;
 	}
 }
