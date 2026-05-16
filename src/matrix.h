@@ -36,6 +36,8 @@ namespace LibMatchstick{
 		Matrix operator*=(float a);
 		friend Matrix operator*(float a,const Matrix&b);
 	};
+
+	typedef Matrix Tensor2d;
 }
 
 #endif

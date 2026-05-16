@@ -5,15 +5,16 @@
 #include<string.h>
 
 namespace LibMatchstick{
-	Matrix::Matrix(){
-		h=0;
-		w=0;
-		data=nullptr;
-	}
+	Matrix::Matrix():
+		h(0),
+		w(0),
+		data(nullptr)
+	{}
 
-	Matrix::Matrix(size_t h,size_t w){
-		this->h=h;
-		this->w=w;
+	Matrix::Matrix(size_t h,size_t w):
+		h(h),
+		w(w)
+	{
 		cudaMalloc(&data,h*w*sizeof(float));
 	}
 
@@ -60,11 +61,12 @@ namespace LibMatchstick{
 	}
 
 	void Matrix::resize(size_t h,size_t w){
+		size_t size=h*w<this->h*this->w?h*w:this->h*this->w;
 		this->w=w;
 		this->h=h;
 		float*tmp;
 		cudaMalloc(&tmp,h*w*sizeof(float));
-		if(data!=nullptr)cudaMemcpy(tmp,data,h*w*sizeof(float),cudaMemcpyDeviceToDevice);
+		if(data!=nullptr)cudaMemcpy(data,tmp,size*sizeof(float),cudaMemcpyDeviceToDevice);
 		cudaFree(data);
 		data=tmp;
 	}
