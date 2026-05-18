@@ -1,5 +1,4 @@
 #include"../tensor_3d.h"
-#include <__clang_cuda_runtime_wrapper.h>
 #include <cstdlib>
 #include"../tensor_4d.h"
 
@@ -254,6 +253,7 @@ namespace LibMatchstick{
 		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
 		if(i<r_c&&j<r_h&&k<r_w){
+
 		}
 	}
 

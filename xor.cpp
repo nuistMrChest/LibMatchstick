@@ -112,8 +112,7 @@ int main() {
         { 0.00f }
     });
 
-    // 原来的 0.8 对你现在的实现太猛了，已经把参数冲成 NaN。
-    const float step = 0.05f;
+    const float step = 0.1f;
     const int epochs = 100000;
 
     for (int epoch = 1; epoch <= epochs; ++epoch) {
