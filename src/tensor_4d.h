@@ -16,6 +16,7 @@ namespace LibMatchstick{
 		Tensor4d();
 		Tensor4d(size_t b,size_t c,size_t h,size_t w);
 		Tensor4d(std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<float>>>>a);
+		~Tensor4d();
 		size_t getBatch()const;
 		size_t getChannel()const;
 		size_t getHeight()const;

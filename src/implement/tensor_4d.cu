@@ -35,7 +35,7 @@ namespace LibMatchstick{
 		h=a.begin()->begin()->size();
 		w=a.begin()->begin()->begin()->size();
 		cudaMalloc(&data,b*c*h*w*sizeof(float));
-		size_t cnt;
+		size_t cnt=0;
 		float*tmp=(float*)std::malloc(b*c*h*w*sizeof(float));
 		for(auto i:a)for(auto j:i)for(auto k:j)for(auto l:k){
 			tmp[cnt]=l;
@@ -43,6 +43,10 @@ namespace LibMatchstick{
 		}
 		cudaMemcpy(data,tmp,b*c*h*w*sizeof(float),cudaMemcpyHostToDevice);
 		free(tmp);
+	}
+
+	Tensor4d::~Tensor4d(){
+		cudaFree(data);
 	}
 
 	size_t Tensor4d::getBatch()const{
@@ -69,7 +73,7 @@ namespace LibMatchstick{
 		this->w=w;
 		float*tmp;
 		cudaMalloc(&tmp,b*c*h*w*sizeof(float));
-		if(data!=nullptr)cudaMemcpy(data,tmp,size*sizeof(float),cudaMemcpyDeviceToDevice);
+		if(data!=nullptr)cudaMemcpy(tmp,data,size*sizeof(float),cudaMemcpyDeviceToDevice);
 		cudaFree(data);
 		data=tmp;
 	}
@@ -84,12 +88,15 @@ namespace LibMatchstick{
 	}
 
 	Tensor4d&Tensor4d::operator=(const Tensor4d&a){
-		this->b=a.b;
-		this->c=a.c;
-		this->h=a.h;
-		this->w=a.w;
-		cudaMalloc(&this->data,b*c*h*w*sizeof(float));
-		cudaMemcpy(this->data,a.data,b*c*h*w*sizeof(float),cudaMemcpyDeviceToDevice);
+		if(this!=&a){
+			this->b=a.b;
+			this->c=a.c;
+			this->h=a.h;
+			this->w=a.w;
+			cudaFree(this->data);
+			cudaMalloc(&this->data,b*c*h*w*sizeof(float));
+			cudaMemcpy(this->data,a.data,b*c*h*w*sizeof(float),cudaMemcpyDeviceToDevice);
+		}
 		return*this;
 	}
 
