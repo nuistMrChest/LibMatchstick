@@ -279,7 +279,7 @@ namespace LibMatchstick{
 								(long long)(t_h)||
 								(long long)(y+kk)-
 								(long long)(padding)>=
-								(long long)(k_w)
+								(long long)(t_w)
 							)
 						)
 							res[r_h*r_w*i+r_w*j+k]+=
