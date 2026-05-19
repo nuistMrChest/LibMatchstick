@@ -275,7 +275,8 @@ namespace LibMatchstick{
 								(long long)(y+kk)-
 								(long long)(padding)<
 								0||
-								(long long)(x+jj)>=
+								(long long)(x+jj)-
+								(long long)(padding)>=
 								(long long)(t_h)||
 								(long long)(y+kk)-
 								(long long)(padding)>=
@@ -296,9 +297,9 @@ namespace LibMatchstick{
 		);
 		dim3 block(8,8,8);
 		dim3 grid(
-			(c+block.x-1)/block.x,
-			(h+block.y-1)/block.y,
-			(w+block.z-1)/block.z
+			(res.getChannel()+block.x-1)/block.x,
+			(res.getHeight()+block.y-1)/block.y,
+			(res.getWidth()+block.z-1)/block.z
 		);
 		dot<<<grid,block>>>(
 				res.getData(),
