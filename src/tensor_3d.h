@@ -20,7 +20,7 @@ namespace LibMatchstick{
 		friend std::ostream&operator<<(std::ostream&os,const Tensor3d&a);
 		size_t getChannel()const;
 		size_t getHeight()const;
-		size_t getWeight()const;
+		size_t getWidth()const;
 		void resize(size_t c,size_t h,size_t w);
 		Tensor3d(const Tensor3d&a);
 		Tensor3d&operator=(const Tensor3d&a);

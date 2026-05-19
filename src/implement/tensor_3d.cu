@@ -69,7 +69,7 @@ namespace LibMatchstick{
 		return h;
 	}
 
-	size_t Tensor3d::getWeight()const{
+	size_t Tensor3d::getWidth()const{
 		return w;
 	}
 
@@ -116,7 +116,7 @@ namespace LibMatchstick{
 		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
-		if(c<i&&h<j&&w<k)
+		if(c>i&&h>j&&w>k)
 			res[i*h*w+j*w+k]=left[i*h*w+j*w+k]+right[i*h*w+j*w+k];
 	}
 
@@ -146,7 +146,7 @@ namespace LibMatchstick{
 		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
-		if(c<i&&h<j&&w<k)
+		if(c>i&&h>j&&w>k)
 			res[i*h*w+j*w+k]=left[i*h*w+j*w+k]-right[i*h*w+j*w+k];
 	}
 
@@ -202,7 +202,7 @@ namespace LibMatchstick{
 		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
-		if(c<i&&h<j&&w<k)
+		if(c>i&&h>j&&w>k)
 			res[i*h*w+j*w+k]=left[i*h*w+j*w+k]*right[i*h*w+j*w+k];
 	}
 
@@ -307,7 +307,7 @@ namespace LibMatchstick{
 				k.getData(),
 				res.getChannel(),
 				res.getHeight(),
-				res.getWeight(),
+				res.getWidth(),
 				stride,
 				padding,
 				k.getChannel(),
