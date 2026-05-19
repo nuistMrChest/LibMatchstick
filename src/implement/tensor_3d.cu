@@ -294,7 +294,6 @@ namespace LibMatchstick{
 			(h+2*padding-k.getHeight())/stride+1,
 			(w+2*padding-k.getWidth())/stride+1
 		);
-		res.resize(c,h,w);
 		dim3 block(8,8,8);
 		dim3 grid(
 			(c+block.x-1)/block.x,
