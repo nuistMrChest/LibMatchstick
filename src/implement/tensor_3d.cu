@@ -1,5 +1,7 @@
 #include"../tensor_3d.h"
+#include <cstddef>
 #include <cstdlib>
+#include <iterator>
 #include"../tensor_4d.h"
 
 namespace LibMatchstick{
@@ -241,19 +243,48 @@ namespace LibMatchstick{
 
 	void __global__ dot(
 		float*res,
-		float*const ten,
-		float*const ker,
+		const float*ten,
+		const float*ker,
 		size_t r_c,
 		size_t r_h,
 		size_t r_w,
 		size_t stride,
-		size_t padding
+		size_t padding,
+		size_t k_c,
+		size_t k_h,
+		size_t k_w,
+		size_t t_c,
+		size_t t_h,
+		size_t t_w
 	){
 		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
 		if(i<r_c&&j<r_h&&k<r_w){
-
+			res[r_h*r_w*i+r_w*j+k]=0;
+			size_t x=j*stride;
+			size_t y=k*stride;
+			for(size_t ii=0;ii<k_c;ii++)
+				for(size_t jj=0;jj<k_h;jj++)
+					for(size_t kk=0;kk<k_w;kk++)
+						if(
+							!(
+								(long long)(x+jj)-
+								(long long)padding<
+								0||
+								(long long)(y+kk)-
+								(long long)(padding)<
+								0||
+								(long long)(x+jj)>=
+								(long long)(t_h)||
+								(long long)(y+kk)-
+								(long long)(padding)>=
+								(long long)(k_w)
+							)
+						)
+							res[r_h*r_w*i+r_w*j+k]+=
+								ten[ii*t_h*t_w+(x+jj-padding)*t_w+(y+kk-padding)]*
+								ker[i*k_c*k_h*k_w+ii*k_h*k_w+jj*k_w+kk];
 		}
 	}
 
@@ -262,6 +293,29 @@ namespace LibMatchstick{
 			k.getBatch(),
 			(h+2*padding-k.getHeight())/stride+1,
 			(w+2*padding-k.getWidth())/stride+1
+		);
+		res.resize(c,h,w);
+		dim3 block(8,8,8);
+		dim3 grid(
+			(c+block.x-1)/block.x,
+			(h+block.y-1)/block.y,
+			(w+block.z-1)/block.z
+		);
+		dot<<<grid,block>>>(
+				res.getData(),
+				data,
+				k.getData(),
+				res.getChannel(),
+				res.getHeight(),
+				res.getWeight(),
+				stride,
+				padding,
+				k.getChannel(),
+				k.getHeight(),
+				k.getWidth(),
+				c,
+				h,
+				w
 		);
 		return res;
 	}
