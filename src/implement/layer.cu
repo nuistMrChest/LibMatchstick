@@ -196,9 +196,9 @@ namespace LibMatchstick{
 			*z=input.convolution(*kernel,stride,padding);
 			dim3 block(8,8,8);
 			dim3 grid(
-				(res.getChannel()+block.x-1)/block.x,
-				(res.getHeight()+block.y-1)/block.y,
-				(res.getWidth()+block.z-1)/block.z
+				(out_c+block.x-1)/block.x,
+				(out_h+block.y-1)/block.y,
+				(out_w+block.z-1)/block.z
 			);
 			add_bias<<<grid,block>>>(b,z->getData(),out_c,out_h,out_w);
 			res=activation(*z);
