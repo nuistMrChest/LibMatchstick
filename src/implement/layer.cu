@@ -1,8 +1,11 @@
 #include"../layer.h"
 #include"../matrix.h"
 #include"../activation.h"
-#include <memory>
-#include <random>
+#include"../tensor_3d.h"
+#include"../tensor_4d.h"
+#include <cstdio>
+#include<memory>
+#include<random>
 
 namespace LibMatchstick{
 	MLPLayer::MLPLayer():
@@ -98,4 +101,92 @@ namespace LibMatchstick{
 		activation_d=a_d;
 	}
 
+	CNNLayer::CNNLayer():
+		b(nullptr),
+		in_c(0),
+		in_h(0),
+		in_w(0),
+		out_c(0),
+		out_h(0),
+		out_w(0),
+		stride(0),
+		padding(0)
+	{
+		activation=Activation::identity_t;
+		activation_d=Activation::identity_t_d;
+	}
+
+	CNNLayer::CNNLayer(
+		size_t in_c,
+		size_t in_h,
+		size_t in_w,
+		size_t out_c,
+		size_t out_h,
+		size_t out_w,
+		size_t k_c,
+		size_t k_h,
+		size_t k_w,
+		size_t s,
+		size_t p
+	):
+		in_c(in_c),
+		in_h(in_h),
+		in_w(in_w),
+		out_c(out_c),
+		out_h(out_h),
+		out_w(out_w),
+		stride(s),
+		padding(p)
+	{
+		cudaMalloc(&b,out_c*sizeof(float));
+		kernel=std::make_unique<Tensor4d>(out_c,k_c,k_h,k_w);
+		last_input=std::make_unique<Tensor3d>(in_c,in_h,in_w);
+		z=std::make_unique<Tensor3d>(out_c,out_h,out_w);
+		activation=Activation::identity_t;
+		activation_d=Activation::identity_t_d;
+	}
+
+	void CNNLayer::init(float low,float high){
+		float*tmp_k=(float*)malloc(
+			kernel->getBatch()*
+			kernel->getChannel()*
+			kernel->getWidth()*
+			kernel->getHeight()*
+			sizeof(float)
+		);
+		float*tmp_b=(float*)malloc(out_c*sizeof(float));
+		static std::mt19937 rng(std::random_device{}());
+		std::uniform_real_distribution<float>dist(low,high);
+		for(size_t i=0;i<out_c;i++){
+			for(size_t j=0;j<kernel->getChannel();j++)
+				for(size_t k;k<kernel->getHeight();k++)
+					for(size_t l=0;l<kernel->getWidth();l++)
+						tmp_k[
+							i*kernel->getChannel()*kernel->getHeight()*kernel->getWidth()+
+							j*kernel->getHeight()*kernel->getWidth()+
+							k*kernel->getWidth()+
+							l
+						]=dist(rng);
+			tmp_b[i]=dist(rng);
+		}
+		cudaMemcpy(
+			kernel->getData(),
+			tmp_k,
+			kernel->getBatch()*kernel->getChannel()*kernel->getHeight()*kernel->getWidth()*sizeof(float),
+			cudaMemcpyHostToDevice
+		);
+		cudaMemcpy(b,tmp_b,out_c*sizeof(float),cudaMemcpyHostToDevice);
+		free(tmp_k);
+		free(tmp_b);
+	}
+
+	Tensor3d CNNLayer::forward(const Tensor3d&input){
+		Tensor3d res;
+		if(input.getChannel()==in_c&&input.getHeight()==in_h&&in_w==input.getWidth()){
+			*last_input=input;
+			*z=input.convolution(*kernel,stride,padding);
+			//here!!!!
+		}
+		return res;
+	}
 }

@@ -2,6 +2,7 @@
 #define ACTIVATION_H
 
 #include"matrix.h"
+#include"tensor_3d.h"
 
 namespace LibMatchstick{
 	namespace Activation{
@@ -17,6 +18,17 @@ namespace LibMatchstick{
 		Matrix identity_d(const Matrix&a);
 		Matrix softmax(const Matrix&a);
 		Matrix softmax_d(const Matrix&a);
+
+		Tensor3d relu_t(const Tensor3d&a);
+		Tensor3d relu_t_d(const Tensor3d&a);
+		Tensor3d leaky_relu_t(const Tensor3d&a);
+		Tensor3d leaky_relu_t_d(const Tensor3d&a);
+		Tensor3d sigmoid_t(const Tensor3d&a);
+		Tensor3d sigmoid_t_d(const Tensor3d&a);
+		Tensor3d tanh_t(const Tensor3d&a);
+		Tensor3d tanh_t_d(const Tensor3d&a);
+		Tensor3d identity_t(const Tensor3d&a);
+		Tensor3d identity_t_d(const Tensor3d&a);
 	}
 }
 
