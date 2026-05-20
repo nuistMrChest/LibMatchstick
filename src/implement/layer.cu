@@ -3,6 +3,8 @@
 #include"../activation.h"
 #include"../tensor_3d.h"
 #include"../tensor_4d.h"
+#include <__clang_cuda_runtime_wrapper.h>
+#include <algorithm>
 #include <cstdio>
 #include<memory>
 #include<random>
@@ -180,13 +182,219 @@ namespace LibMatchstick{
 		free(tmp_b);
 	}
 
+	void __global__ add_bias(float*b,float*res,size_t o_c,size_t o_h,size_t o_w){
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
+		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
+		if(i<o_c&&j<o_h&&k<o_w)
+			res[i*o_h*o_w+j*o_w+k]+=b[i];
+	}
+
 	Tensor3d CNNLayer::forward(const Tensor3d&input){
 		Tensor3d res;
 		if(input.getChannel()==in_c&&input.getHeight()==in_h&&in_w==input.getWidth()){
 			*last_input=input;
 			*z=input.convolution(*kernel,stride,padding);
-			//here!!!!
+			dim3 block(8,8,8);
+			dim3 grid(
+				(res.getChannel()+block.x-1)/block.x,
+				(res.getHeight()+block.y-1)/block.y,
+				(res.getWidth()+block.z-1)/block.z
+			);
+			add_bias<<<grid,block>>>(b,z->getData(),out_c,out_h,out_w);
+			res=activation(*z);
 		}
 		return res;
+	}
+
+	void __global__ get_dl_da(
+		float*kernel,
+		float*res,
+		float*dl_dz,
+		size_t i_c,
+		size_t i_h,
+		size_t i_w,
+		size_t o_c,
+		size_t o_h,
+		size_t o_w,
+		size_t stride,
+		size_t padding,
+		size_t k_c,
+		size_t k_h,
+		size_t k_w
+	){
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
+		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
+		if(i<o_c&&j<o_h&&k<o_w)
+			for(size_t ii=0;ii<i_c;ii++)
+				for(size_t jj=0;jj<i_h;jj++)
+					for(size_t kk=0;kk<i_w;kk++)
+						if(
+							!(
+								(long long)jj-
+								(long long)(stride*j+padding)<
+								0||
+								(long long)kk-
+								(long long)(stride*k+padding)<
+								0||
+								(long long)jj-
+								(long long)(stride*j+padding)>=
+								(long long)k_h||
+								(long long)kk-
+								(long long)(stride*k+padding)>=
+								(long long)k_w
+							)
+						)
+							res[ii*i_h*i_w+jj*i_w+kk]+=
+								dl_dz[i*o_h*o_w+j*o_w+k]*
+								kernel[
+									(i*k_c*k_h*k_w)+
+									(ii*k_h*k_w)+
+									(jj-j*stride+padding)*k_w+
+									(kk-k*stride+padding)
+								];
+	}
+
+	void __global__ grad_update_ker(
+		float*kernel,
+		float*dl_dz,
+		float*last_input,
+		size_t i_c,
+		size_t i_h,
+		size_t i_w,
+		size_t o_c,
+		size_t o_h,
+		size_t o_w,
+		size_t stride,
+		size_t padding,
+		size_t k_c,
+		size_t k_h,
+		size_t k_w,
+		float step
+	){
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
+		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
+		if(i<o_c&&j<o_h&&k<o_w)
+			for(size_t ii=0;ii<k_c;ii++)
+				for(size_t jj=0;jj<k_h;jj++)
+					for(size_t  kk=0;kk<k_w;kk++)
+						if(
+							!(
+								(long long)(j*stride+jj)-
+								(long long)padding<
+								0||
+								(long long)(k*stride+kk)-
+								(long long)padding<
+								0||
+								(long long)(j*stride+jj)-
+								(long long)padding>=
+								(long long)i_h||
+								(long long)(k*stride+kk)-
+								(long long)padding>=
+								(long long)i_w
+							)
+						)
+							kernel[i*k_c*k_h*k_w+kk*k_h*k_w+j*k_w+k]-=
+								step*(
+									dl_dz[i*o_h*o_w+j*o_w+k]*
+									last_input[ii*i_h*i_w+(j*stride+jj-padding)*i_w+(k*stride+kk-padding)]
+								);
+	}
+
+	void __global__ grad_update_bias(
+		float*b,
+		float*dl_dz,
+		size_t o_c,
+		size_t o_h,
+		size_t o_w,
+		float step
+	){
+		for(size_t i=0;i<o_c;i++)
+			for(size_t j=0;j<o_h;j++)
+				for(size_t k=0;k<o_w;k++)
+					b[i]-=step-dl_dz[i*o_h*o_w+j*o_w+k];
+	}
+
+	Tensor3d CNNLayer::backward(const Tensor3d&dl_da,float step){
+		Tensor3d res(in_c,in_h,in_w);
+		cudaMemset(res.getData(),0,in_c*in_h*in_w*sizeof(float));
+		Tensor3d dl_dz=dl_da.hadamard(activation_d(*z));
+		dim3 block(8,8,8);
+		dim3 grid(
+			(out_c+block.x-1)/block.x,
+			(out_h+block.y-1)/block.y,
+			(out_w+block.z-1)/block.z
+		);
+		get_dl_da<<<grid,block>>>(
+			kernel->getData(),
+			res.getData(),
+			dl_dz.getData(),
+			in_c,
+			in_h,
+			in_w,
+			out_c,
+			out_h,
+			out_w,
+			stride,
+			padding,
+			kernel->getChannel(),
+			kernel->getHeight(),
+			kernel->getWidth()
+		);
+		grad_update_ker<<<grid,block>>>(
+			kernel->getData(),
+			dl_dz.getData(),
+			last_input->getData(),
+			in_c,
+			in_h,
+			in_w,
+			out_c,
+			out_h,
+			out_w,
+			stride,
+			padding,
+			kernel->getChannel(),
+			kernel->getHeight(),
+			kernel->getWidth(),
+			step
+		);
+		grad_update_bias<<<1,1>>>(b,dl_dz.getData(),out_c,out_h,out_w,step);
+		return res;
+	}
+
+	Tensor4d CNNLayer::saveKernel()const{
+		return*kernel;
+	}
+
+	float*CNNLayer::saveBias()const{
+		return b;
+	}
+
+	bool CNNLayer::loadKernel(const Tensor4d&k){
+		if(
+			kernel->getBatch()==k.getBatch()&&
+			kernel->getChannel()==k.getChannel()&&
+			kernel->getHeight()==k.getHeight()&&
+			kernel->getWidth()==k.getWidth()
+		){
+			*kernel=k;
+			return true;
+		}
+		return false;
+	}
+
+	bool CNNLayer::loadBias(float*b){
+		cudaMemcpy(this->b,b,out_c*sizeof(float),cudaMemcpyHostToDevice);
+		return true;
+	}
+
+	void CNNLayer::setActivation(
+		const std::function<Tensor3d(const Tensor3d&)>&a,
+		const std::function<Tensor3d(const Tensor3d&)>&a_d
+	){
+		activation=a;
+		activation_d=a_d;
 	}
 }

@@ -69,9 +69,9 @@ namespace LibMatchstick{
 		Tensor3d backward(const Tensor3d&dl_da,float step);
 		void init(float low=-1,float high=1);
 		Tensor4d saveKernel()const;
-		float saveBias()const;
-		bool loadKernel(const Tensor4d&W);
-		bool loadBias(float b);
+		float*saveBias()const;
+		bool loadKernel(const Tensor4d&k);
+		bool loadBias(float*b);
 		void setActivation(
 			const std::function<Tensor3d(const Tensor3d&)>&a,
 			const std::function<Tensor3d(const Tensor3d&)>&a_d

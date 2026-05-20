@@ -1,7 +1,6 @@
 #include"../tensor_3d.h"
-#include <cstddef>
-#include <cstdlib>
-#include <iterator>
+#include<cstddef>
+#include<cstdlib>
 #include"../tensor_4d.h"
 
 namespace LibMatchstick{
