@@ -160,7 +160,7 @@ namespace LibMatchstick{
 		std::uniform_real_distribution<float>dist(low,high);
 		for(size_t i=0;i<out_c;i++){
 			for(size_t j=0;j<kernel->getChannel();j++)
-				for(size_t k;k<kernel->getHeight();k++)
+				for(size_t k=0;k<kernel->getHeight();k++)
 					for(size_t l=0;l<kernel->getWidth();l++)
 						tmp_k[
 							i*kernel->getChannel()*kernel->getHeight()*kernel->getWidth()+
