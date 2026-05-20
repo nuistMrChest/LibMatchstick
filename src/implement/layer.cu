@@ -272,13 +272,13 @@ namespace LibMatchstick{
 		size_t k_w,
 		float step
 	){
-		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
-		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
-		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
-		if(i<o_c&&j<o_h&&k<o_w)
-			for(size_t ii=0;ii<k_c;ii++)
-				for(size_t jj=0;jj<k_h;jj++)
-					for(size_t  kk=0;kk<k_w;kk++)
+		size_t ii=blockIdx.x*blockDim.x+threadIdx.x;
+		size_t jj=blockIdx.y*blockDim.y+threadIdx.y;
+		size_t kk=blockIdx.z*blockDim.z+threadIdx.z;
+		if(ii<k_c&&jj<k_h&&kk<k_w)
+			for(size_t i=0;ii<o_c;ii++)
+				for(size_t j=0;jj<o_h;jj++)
+					for(size_t  k=0;kk<o_w;kk++)
 						if(
 							!(
 								(long long)(j*stride+jj)-
@@ -295,7 +295,7 @@ namespace LibMatchstick{
 								(long long)i_w
 							)
 						)
-							kernel[i*k_c*k_h*k_w+kk*k_h*k_w+j*k_w+k]-=
+							kernel[i*k_c*k_h*k_w+ii*k_h*k_w+jj*k_w+kk]-=
 								step*(
 									dl_dz[i*o_h*o_w+j*o_w+k]*
 									last_input[ii*i_h*i_w+(j*stride+jj-padding)*i_w+(k*stride+kk-padding)]
@@ -313,7 +313,7 @@ namespace LibMatchstick{
 		for(size_t i=0;i<o_c;i++)
 			for(size_t j=0;j<o_h;j++)
 				for(size_t k=0;k<o_w;k++)
-					b[i]-=step-dl_dz[i*o_h*o_w+j*o_w+k];
+					b[i]-=step*dl_dz[i*o_h*o_w+j*o_w+k];
 	}
 
 	Tensor3d CNNLayer::backward(const Tensor3d&dl_da,float step){
@@ -342,7 +342,13 @@ namespace LibMatchstick{
 			kernel->getHeight(),
 			kernel->getWidth()
 		);
-		grad_update_ker<<<grid,block>>>(
+		dim3 block2(8,8,8);
+		dim3 grid2(
+			(kernel->getChannel()+block.x-1)/block.x,
+			(kernel->getHeight()+block.y-1)/block.y,
+			(kernel->getWidth()+block.z-1)/block.z
+		);
+		grad_update_ker<<<grid2,block2>>>(
 			kernel->getData(),
 			dl_dz.getData(),
 			last_input->getData(),
