@@ -3,9 +3,8 @@
 #include"../activation.h"
 #include"../tensor_3d.h"
 #include"../tensor_4d.h"
-#include <__clang_cuda_runtime_wrapper.h>
-#include <algorithm>
-#include <cstdio>
+#include<algorithm>
+#include<cstdio>
 #include<memory>
 #include<random>
 
@@ -398,5 +397,9 @@ namespace LibMatchstick{
 	){
 		activation=a;
 		activation_d=a_d;
+	}
+
+	CNNLayer::~CNNLayer(){
+		cudaFree(b);
 	}
 }
