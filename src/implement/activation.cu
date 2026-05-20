@@ -395,11 +395,34 @@ namespace LibMatchstick{
 			return a;
 		}
 
-		Tensor3d identity_t_d(const Tensor3d&a){
-			Tensor3d res(a.getChannel(),a.getHeight(),a.getWidth());
-			cudaMemset(res.getData(),1,a.getChannel()*a.getHeight()*a.getWidth()*sizeof(float));
-			return res;
+		void __global__ scalor_identity_t_d(
+			float*to,
+			size_t c,
+			size_t h,
+			size_t w
+		){
+			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
+			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
+			if(i<c&&j<h&&k<w)
+				to[i*h*w+j*w+k]=1.0f;
 		}
 
+		Tensor3d identity_t_d(const Tensor3d& a){
+			Tensor3d res(a.getChannel(),a.getHeight(),a.getWidth());
+			dim3 block(8,8,8);
+			dim3 grid(
+				(res.getChannel()+block.x-1)/block.x,
+				(res.getHeight()+block.y-1)/block.y,
+				(res.getWidth()+block.z-1)/block.z
+			);
+			scalor_identity_t_d<<<grid,block>>>(
+				res.getData(),
+				res.getChannel(),
+				res.getHeight(),
+				res.getWidth()
+			);
+			return res;
+		}
 	}
 }
