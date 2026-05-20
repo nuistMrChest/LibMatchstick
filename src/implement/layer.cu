@@ -369,7 +369,9 @@ namespace LibMatchstick{
 	}
 
 	float*CNNLayer::saveBias()const{
-		return b;
+		float*tmp=(float*)malloc(out_c*sizeof(float));
+		cudaMemcpy(tmp,b,out_c*sizeof(float),cudaMemcpyDeviceToHost);
+		return tmp;
 	}
 
 	bool CNNLayer::loadKernel(const Tensor4d&k){
