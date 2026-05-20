@@ -341,7 +341,7 @@ namespace LibMatchstick{
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
-			if(i<c&&j<h&&k>w)
+			if(i<c&&j<h&&k<w)
 				to[i*h*w+j*w+k]=tanhf(from[i*h*w+j*w+k]);
 		}
 
