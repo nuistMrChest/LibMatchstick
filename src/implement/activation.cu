@@ -42,7 +42,7 @@ namespace LibMatchstick{
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			if(i<h&&j<w)
-				to[i*w+j]=from[i*w+j]>0?from[i*w+j]:0.01;
+				to[i*w+j]=from[i*w+j]>0?from[i*w+j]:0.01*from[i*w+j];
 		}
 
 		Matrix leaky_relu(const Matrix&a){
@@ -241,7 +241,7 @@ namespace LibMatchstick{
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
 			if(i<c&&j<h&&k<w)
-				to[i*h*w+j*w+k]=from[i*h*w+j*w+k]>0?from[i*h*w+j*w+k]:0.01;
+				to[i*h*w+j*w+k]=from[i*h*w+j*w+k]>0?from[i*h*w+j*w+k]:0.01*from[i*h*w+j*w+k];
 		}
 
 		Tensor3d leaky_relu_t(const Tensor3d&a){
