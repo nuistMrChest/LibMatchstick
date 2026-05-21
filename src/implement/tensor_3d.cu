@@ -41,8 +41,11 @@ namespace LibMatchstick{
 
 	std::ostream&operator<<(std::ostream&os,const Tensor3d&a){
 		if(a.c==0){
-				os<<"{ NULL }";
-			}
+			os<<"{ NULL }";
+		}
+		else{
+			float*tmp=(float*)malloc(a.c*a.h*a.w*sizeof(float));
+			cudaMemcpy(tmp,a.data,a.c*a.h*a.w*sizeof(float),cudaMemcpyDeviceToHost);
 			for(size_t i=0;i<a.c;i++){
 				if(i==0)os<<"{\n";
 				else os<<" ";
@@ -50,7 +53,7 @@ namespace LibMatchstick{
 					if(j==0)os<<"{\n";
 					else os<<"  ";
 					for(size_t k=0;k<a.w;k++){
-						os<<a.data[i*a.h+j*a.w+k]<<" ";
+						os<<tmp[i*a.h+j*a.w+k]<<" ";
 					}
 					if(j==a.h-1)os<<"\n }";
 					else os<<"\n";
@@ -58,6 +61,7 @@ namespace LibMatchstick{
 				if(i==a.c-1)os<<"\n}";
 				else os<<"\n";
 			}
+		}
 		return os;
 	}
 
