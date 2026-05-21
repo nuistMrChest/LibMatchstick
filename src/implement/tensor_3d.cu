@@ -53,7 +53,7 @@ namespace LibMatchstick{
 					if(j==0)os<<"{\n";
 					os<<"  ";
 					for(size_t k=0;k<a.w;k++){
-						os<<tmp[i*a.h+j*a.w+k]<<" ";
+						os<<tmp[i*a.h*a.w+j*a.w+k]<<" ";
 					}
 					if(j==a.h-1)os<<"\n }";
 					else os<<"\n";
