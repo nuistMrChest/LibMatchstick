@@ -284,9 +284,9 @@ namespace LibMatchstick{
 		size_t jj=blockIdx.y*blockDim.y+threadIdx.y;
 		size_t kk=blockIdx.z*blockDim.z+threadIdx.z;
 		if(ii<k_c&&jj<k_h&&kk<k_w)
-			for(size_t i=0;ii<o_c;ii++)
-				for(size_t j=0;jj<o_h;jj++)
-					for(size_t  k=0;kk<o_w;kk++)
+			for(size_t i=0;i<o_c;i++)
+				for(size_t j=0;j<o_h;j++)
+					for(size_t  k=0;k<o_w;k++)
 						if(
 							!(
 								(long long)(j*stride+jj)-
