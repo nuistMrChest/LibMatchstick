@@ -48,10 +48,10 @@ namespace LibMatchstick{
 			cudaMemcpy(tmp,a.data,a.c*a.h*a.w*sizeof(float),cudaMemcpyDeviceToHost);
 			for(size_t i=0;i<a.c;i++){
 				if(i==0)os<<"{\n";
-				else os<<" ";
+				os<<" ";
 				for(size_t j=0;j<a.h;j++){
 					if(j==0)os<<"{\n";
-					else os<<"  ";
+					os<<"  ";
 					for(size_t k=0;k<a.w;k++){
 						os<<tmp[i*a.h+j*a.w+k]<<" ";
 					}
