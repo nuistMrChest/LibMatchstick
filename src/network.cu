@@ -223,6 +223,7 @@ namespace LibMatchstick{
 	void CNN::init(float high,float low){
 		for(size_t i=0;i<layers.size();i++)
 			layers[i].init(high,low);
+		m.init(high,low);
 	}
 }
 
