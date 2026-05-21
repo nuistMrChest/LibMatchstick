@@ -15,6 +15,8 @@ namespace LibMatchstick{
 				for(size_t j=0;j<w;j++)
 					sum+=(tmp_x[i*w+j]-tmp_e[i*w+j])*(tmp_x[i*w+j]-tmp_e[i*w+j]);
 			float res=sum/2;
+			free(tmp_x);
+			free(tmp_e);
 			return res;
 		}
 
@@ -36,6 +38,8 @@ namespace LibMatchstick{
 					if(tmp>0)sum+=tmp;
 					else sum-=tmp;
 				}
+			free(tmp_x);
+			free(tmp_e);
 			return sum/(w*h);
 		}
 
@@ -80,6 +84,8 @@ namespace LibMatchstick{
 					if(v>1-eps)v=1-eps;
 					res-=tmp_e[i*w+j]*logf(v);
 				}
+			free(tmp_x);
+			free(tmp_e);
 			return res;
 		}
 
@@ -105,7 +111,7 @@ namespace LibMatchstick{
 				(res.getHeight()+block.x-1)/block.x,
 				(res.getWidth()+block.y-1)/block.y
 			);
-			scalor_cross_entropy_d<<<grid,block>>>(x.getData(),e.getData(),res.getData(),x.getHeight(),x.getHeight());
+			scalor_cross_entropy_d<<<grid,block>>>(x.getData(),e.getData(),res.getData(),x.getHeight(),x.getWidth());
 			return res;
 		}
 	}

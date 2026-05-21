@@ -66,7 +66,7 @@ namespace LibMatchstick{
 		this->h=h;
 		float*tmp;
 		cudaMalloc(&tmp,h*w*sizeof(float));
-		if(data!=nullptr)cudaMemcpy(data,tmp,size*sizeof(float),cudaMemcpyDeviceToDevice);
+		if(data!=nullptr)cudaMemcpy(tmp,data,size*sizeof(float),cudaMemcpyDeviceToDevice);
 		cudaFree(data);
 		data=tmp;
 	}
@@ -254,7 +254,7 @@ namespace LibMatchstick{
 			(res.h+block.x-1)/block.x,
 			(res.w+block.y-1)/block.y
 		);
-		scalor_transpose<<<block,grid>>>(data,res.data,h,w);
+		scalor_transpose<<<grid,block>>>(data,res.data,h,w);
 		return res;
 	}
 

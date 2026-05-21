@@ -1,4 +1,5 @@
 #include"../include/activation.h"
+#include <cmath>
 
 namespace LibMatchstick{
 	namespace Activation{
@@ -178,7 +179,7 @@ namespace LibMatchstick{
 		}
 
 		void __global__ matrix_softmax(const float*from,float*to,size_t h,size_t w){
-			float mx=0;
+			float mx=-INFINITY;
 			for(size_t i=0;i<h;i++)
 				for(size_t j=0;j<w;j++)
 					if(from[i*w+j]>mx)mx=from[i*w+j];
