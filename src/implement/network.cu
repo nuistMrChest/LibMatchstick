@@ -189,7 +189,7 @@ namespace LibMatchstick{
 		);
 		for(size_t i=0;i<layers.size();i++){
 			size_t j=layers.size()-1-i;
-			last_dl_da=layers[i].backward(last_dl_da,step);
+			last_dl_da=layers[j].backward(last_dl_da,step);
 		}
 		return res;
 	}
