@@ -61,6 +61,7 @@ namespace LibMatchstick{
 				if(i==a.c-1)os<<"\n}";
 				else os<<"\n";
 			}
+			free(tmp);
 		}
 		return os;
 	}

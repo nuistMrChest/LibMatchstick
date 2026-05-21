@@ -1,4 +1,5 @@
 #include"../activation.h"
+#include <__clang_cuda_runtime_wrapper.h>
 
 namespace LibMatchstick{
 	namespace Activation{
@@ -155,9 +156,25 @@ namespace LibMatchstick{
 			return a;
 		}
 
+		void __global__ scalor_identity_d(
+			float*to,
+			size_t h,
+			size_t w
+		){
+			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
+			if(i<h&&j<w)
+				to[i*w+j]=1.0f;
+		}
+
 		Matrix identity_d(const Matrix&a){
 			Matrix res(a.getHeight(),a.getWidth());
-			cudaMemset(res.getData(),1,a.getHeight()*a.getWidth()*sizeof(float));
+			dim3 block(16,16);
+			dim3 grid(
+				(res.getHeight()+block.x-1)/block.x,
+				(res.getWidth()+block.y-1)/block.y
+			);
+			scalor_identity_d<<<grid,block>>>(res.getData(),res.getHeight(),res.getWidth());
 			return res;
 		}
 
