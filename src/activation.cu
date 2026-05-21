@@ -1,4 +1,4 @@
-#include"../activation.h"
+#include"../include/activation.h"
 
 namespace LibMatchstick{
 	namespace Activation{

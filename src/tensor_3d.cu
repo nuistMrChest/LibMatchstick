@@ -1,8 +1,8 @@
-#include"../tensor_3d.h"
+#include"../include/tensor_3d.h"
 #include<cstddef>
 #include<cstdlib>
-#include"../tensor_4d.h"
-#include"../matrix.h"
+#include"../include/tensor_4d.h"
+#include"../include/matrix.h"
 
 namespace LibMatchstick{
 	Tensor3d::Tensor3d():

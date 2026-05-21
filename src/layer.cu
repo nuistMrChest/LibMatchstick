@@ -1,8 +1,8 @@
-#include"../layer.h"
-#include"../matrix.h"
-#include"../activation.h"
-#include"../tensor_3d.h"
-#include"../tensor_4d.h"
+#include"../include/layer.h"
+#include"../include/matrix.h"
+#include"../include/activation.h"
+#include"../include/tensor_3d.h"
+#include"../include/tensor_4d.h"
 #include<algorithm>
 #include<cstdio>
 #include<memory>
