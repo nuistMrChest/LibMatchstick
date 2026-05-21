@@ -240,16 +240,16 @@ namespace LibMatchstick{
 						if(
 							!(
 								(long long)jj-
-								(long long)(stride*j+padding)<
+								(long long)(stride*j-padding)<
 								0||
 								(long long)kk-
-								(long long)(stride*k+padding)<
+								(long long)(stride*k-padding)<
 								0||
 								(long long)jj-
-								(long long)(stride*j+padding)>=
+								(long long)(stride*j-padding)>=
 								(long long)k_h||
 								(long long)kk-
-								(long long)(stride*k+padding)>=
+								(long long)(stride*k-padding)>=
 								(long long)k_w
 							)
 						)
