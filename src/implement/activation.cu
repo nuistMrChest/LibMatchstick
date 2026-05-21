@@ -1,5 +1,4 @@
 #include"../activation.h"
-#include <__clang_cuda_runtime_wrapper.h>
 
 namespace LibMatchstick{
 	namespace Activation{
