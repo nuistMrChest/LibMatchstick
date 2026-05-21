@@ -102,6 +102,14 @@ namespace LibMatchstick{
 		activation_d=a_d;
 	}
 
+	bool MLPLayer::isSm()const{
+		return sm;
+	}
+
+	void MLPLayer::setSm(){
+		sm=true;
+	}
+
 	CNNLayer::CNNLayer():
 		b(nullptr),
 		in_c(0),
@@ -373,10 +381,10 @@ namespace LibMatchstick{
 		return*kernel;
 	}
 
-	float*CNNLayer::saveBias()const{
+	std::vector<float>CNNLayer::saveBias()const{
 		float*tmp=(float*)malloc(out_c*sizeof(float));
 		cudaMemcpy(tmp,b,out_c*sizeof(float),cudaMemcpyDeviceToHost);
-		return tmp;
+		return std::vector<float>(tmp,tmp+out_c);
 	}
 
 	bool CNNLayer::loadKernel(const Tensor4d&k){
@@ -392,8 +400,8 @@ namespace LibMatchstick{
 		return false;
 	}
 
-	bool CNNLayer::loadBias(float*b){
-		cudaMemcpy(this->b,b,out_c*sizeof(float),cudaMemcpyHostToDevice);
+	bool CNNLayer::loadBias(const std::vector<float>&b){
+		cudaMemcpy(this->b,b.data(),out_c*sizeof(float),cudaMemcpyHostToDevice);
 		return true;
 	}
 
@@ -407,5 +415,54 @@ namespace LibMatchstick{
 
 	CNNLayer::~CNNLayer(){
 		cudaFree(b);
+	}
+
+	CNNLayer::CNNLayer(const CNNLayer&a){
+		activation=a.activation;
+		activation_d=a.activation_d;
+		kernel=std::make_unique<Tensor4d>(*a.kernel);
+		last_input=std::make_unique<Tensor3d>(*a.last_input);
+		z=std::make_unique<Tensor3d>(*a.z);
+		in_c=a.in_c;
+		in_h=a.in_h;
+		in_w=a.in_w;
+		out_c=a.out_c;
+		out_h=a.out_h;
+		out_w=a.out_w;
+		stride=a.stride;
+		padding=a.padding;
+		cudaMalloc(&b,out_c*sizeof(float));
+		cudaMemcpy(b,a.b,out_c*sizeof(float),cudaMemcpyDeviceToDevice);
+	}
+
+	CNNLayer&CNNLayer::operator=(const CNNLayer&a){
+		activation=a.activation;
+		activation_d=a.activation_d;
+		kernel=std::make_unique<Tensor4d>(*a.kernel);
+		last_input=std::make_unique<Tensor3d>(*a.last_input);
+		z=std::make_unique<Tensor3d>(*a.z);
+		in_c=a.in_c;
+		in_h=a.in_h;
+		in_w=a.in_w;
+		out_c=a.out_c;
+		out_h=a.out_h;
+		out_w=a.out_w;
+		stride=a.stride;
+		padding=a.padding;
+		cudaMalloc(&b,out_c*sizeof(float));
+		cudaMemcpy(b,a.b,out_c*sizeof(float),cudaMemcpyDeviceToDevice);
+		return*this;
+	}
+
+	size_t CNNLayer::getOutChannel()const{
+		return out_c;
+	}
+
+	size_t CNNLayer::getOutHeight()const{
+		return out_h;
+	}
+
+	size_t CNNLayer::getOutWidth()const{
+		return out_w;
 	}
 }

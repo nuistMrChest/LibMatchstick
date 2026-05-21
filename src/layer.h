@@ -35,6 +35,8 @@ namespace LibMatchstick{
 			const std::function<Matrix(const Matrix&)>&a,
 			const std::function<Matrix(const Matrix&)>&a_d
 		);
+		bool isSm()const;
+		void setSm();
 	};
 
 	class CNNLayer{
@@ -53,29 +55,34 @@ namespace LibMatchstick{
 		CNNLayer();
 		CNNLayer(
 			size_t in_c,
-			 size_t in_h,
-			 size_t in_w,
-			 size_t out_c,
-			 size_t out_h,
-			 size_t out_w,
-			 size_t k_c,
-			 size_t k_h,
-			 size_t k_w,
-			 size_t s,
-			 size_t p
+			size_t in_h,
+			size_t in_w,
+			size_t out_c,
+			size_t out_h,
+			size_t out_w,
+			size_t k_c,
+			size_t k_h,
+			size_t k_w,
+			size_t s,
+			size_t p
 		);
 		~CNNLayer();
 		Tensor3d forward(const Tensor3d&input);
 		Tensor3d backward(const Tensor3d&dl_da,float step);
 		void init(float low=-1,float high=1);
 		Tensor4d saveKernel()const;
-		float*saveBias()const;
+		std::vector<float>saveBias()const;
 		bool loadKernel(const Tensor4d&k);
-		bool loadBias(float*b);
+		bool loadBias(const std::vector<float>&b);
 		void setActivation(
 			const std::function<Tensor3d(const Tensor3d&)>&a,
 			const std::function<Tensor3d(const Tensor3d&)>&a_d
 		);
+		CNNLayer(const CNNLayer&a);
+		CNNLayer&operator=(const CNNLayer&a);
+		size_t getOutChannel()const;
+		size_t getOutHeight()const;
+		size_t getOutWidth()const;
 	};
 }
 

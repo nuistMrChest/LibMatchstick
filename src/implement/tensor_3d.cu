@@ -2,6 +2,7 @@
 #include<cstddef>
 #include<cstdlib>
 #include"../tensor_4d.h"
+#include"../matrix.h"
 
 namespace LibMatchstick{
 	Tensor3d::Tensor3d():
@@ -301,21 +302,33 @@ namespace LibMatchstick{
 			(res.getWidth()+block.z-1)/block.z
 		);
 		dot<<<grid,block>>>(
-				res.getData(),
-				data,
-				k.getData(),
-				res.getChannel(),
-				res.getHeight(),
-				res.getWidth(),
-				stride,
-				padding,
-				k.getChannel(),
-				k.getHeight(),
-				k.getWidth(),
-				c,
-				h,
-				w
+			res.getData(),
+			data,
+			k.getData(),
+			res.getChannel(),
+			res.getHeight(),
+			res.getWidth(),
+			stride,
+			padding,
+			k.getChannel(),
+			k.getHeight(),
+			k.getWidth(),
+			c,
+			h,
+			w
 		);
+		return res;
+	}
+
+	Matrix Tensor3d::flatten(){
+		Matrix res(c*h*w,1);
+		cudaMemcpy(res.getData(),data,c*h*w*sizeof(float),cudaMemcpyDeviceToDevice);
+		return res;
+	}
+
+	Tensor3d Tensor3d::deflatten(const Matrix&a,size_t c,size_t h,size_t w){
+		Tensor3d res(c,h,w);
+		cudaMemcpy(res.getData(),a.getData(),c*h*w*sizeof(float),cudaMemcpyDeviceToDevice);
 		return res;
 	}
 }

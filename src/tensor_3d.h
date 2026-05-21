@@ -7,6 +7,7 @@
 #include<vector>
 
 namespace LibMatchstick{
+	class Matrix;
 	class Tensor4d;
 	class Tensor3d{
 	private:
@@ -34,6 +35,8 @@ namespace LibMatchstick{
 		float*getData();
 		const float*getData()const;
 		Tensor3d convolution(const Tensor4d&k,size_t stride,size_t padding)const;
+		Matrix flatten();
+		static Tensor3d deflatten(const Matrix&a,size_t c,size_t h,size_t w);
 	};
 }
 
