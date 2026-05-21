@@ -230,13 +230,13 @@ namespace LibMatchstick{
 		size_t k_h,
 		size_t k_w
 	){
-		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
-		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
-		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
-		if(i<o_c&&j<o_h&&k<o_w)
-			for(size_t ii=0;ii<i_c;ii++)
-				for(size_t jj=0;jj<i_h;jj++)
-					for(size_t kk=0;kk<i_w;kk++)
+		size_t ii=blockIdx.x*blockDim.x+threadIdx.x;
+		size_t jj=blockIdx.y*blockDim.y+threadIdx.y;
+		size_t kk=blockIdx.z*blockDim.z+threadIdx.z;
+		if(ii<i_c&&jj<i_h&&kk<i_w)
+			for(size_t i=0;i<o_c;i++)
+				for(size_t j=0;j<o_h;j++)
+					for(size_t k=0;k<o_w;k++)
 						if(
 							!(
 								(long long)jj-
@@ -330,9 +330,9 @@ namespace LibMatchstick{
 		Tensor3d dl_dz=dl_da.hadamard(activation_d(*z));
 		dim3 block(8,8,8);
 		dim3 grid(
-			(out_c+block.x-1)/block.x,
-			(out_h+block.y-1)/block.y,
-			(out_w+block.z-1)/block.z
+			(in_c+block.x-1)/block.x,
+			(in_h+block.y-1)/block.y,
+			(in_w+block.z-1)/block.z
 		);
 		get_dl_da<<<grid,block>>>(
 			kernel->getData(),
