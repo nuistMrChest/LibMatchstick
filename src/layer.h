@@ -26,7 +26,7 @@ namespace LibMatchstick{
 		Matrix forward(const Matrix&input);
 		Matrix backward(const Matrix&dl_da,float step);
 		Matrix backward_dz(const Matrix&dl_dz,float step);
-		void init(float low=-1,float high=1);
+		void init(float high=1,float low=-1);
 		Matrix saveWeight()const;
 		Matrix saveBias()const;
 		bool loadWeight(const Matrix&W);
@@ -69,7 +69,7 @@ namespace LibMatchstick{
 		~CNNLayer();
 		Tensor3d forward(const Tensor3d&input);
 		Tensor3d backward(const Tensor3d&dl_da,float step);
-		void init(float low=-1,float high=1);
+		void init(float high=1,float low=-1);
 		Tensor4d saveKernel()const;
 		std::vector<float>saveBias()const;
 		bool loadKernel(const Tensor4d&k);
