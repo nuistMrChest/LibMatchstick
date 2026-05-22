@@ -82,7 +82,6 @@ The exact requirements depend on how the library is built on your system.
 
 Common requirements:
 
-- A C++ compiler
 - CMake
 - CUDA Toolkit
 - A CUDA-capable GPU
@@ -91,11 +90,6 @@ Common requirements:
 On Linux, typical compilers include:
 
 - GCC
-- Clang
-
-On Windows, typical compilers include:
-
-- MSVC
 - Clang
 - NVCC with a supported host compiler
 
@@ -118,14 +112,7 @@ For example, the result may be a shared library such as:
 libmatchstick.so
 ```
 
-on Linux, or:
-
-```text
-matchstick.dll
-matchstick.lib
-```
-
-on Windows.
+on Linux
 
 ---
 
