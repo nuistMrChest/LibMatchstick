@@ -251,8 +251,8 @@ namespace LibMatchstick{
 		Matrix res(w,h);
 		dim3 block(16,16);
 		dim3 grid(
-			(res.h+block.x-1)/block.x,
-			(res.w+block.y-1)/block.y
+			(h+block.x-1)/block.x,
+			(w+block.y-1)/block.y
 		);
 		scalor_transpose<<<grid,block>>>(data,res.data,h,w);
 		return res;
@@ -272,7 +272,7 @@ namespace LibMatchstick{
 			(res.h+block.x-1)/block.x,
 			(res.w+block.y-1)/block.y
 		);
-		mul<<<block,grid>>>(res.data,data,a,h,w);
+		mul<<<grid,block>>>(res.data,data,a,h,w);
 		return res;
 	}
 

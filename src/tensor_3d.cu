@@ -85,7 +85,7 @@ namespace LibMatchstick{
 		this->w=w;
 		float*tmp;
 		cudaMalloc(&tmp,c*h*w*sizeof(float));
-		if(data!=nullptr)cudaMemcpy(data,tmp,size*sizeof(float),cudaMemcpyDeviceToDevice);
+		if(data!=nullptr)cudaMemcpy(tmp,data,size*sizeof(float),cudaMemcpyDeviceToDevice);
 		cudaFree(data);
 		data=tmp;
 	}
