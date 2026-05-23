@@ -93,7 +93,7 @@ namespace LibMatchstick{
 		return x*w+y;
 	}
 
-	void __global__ scalor_add(
+	static void __global__ scalor_add(
 		float*res,
 		float*const left,
 		float*const right,
@@ -118,7 +118,7 @@ namespace LibMatchstick{
 		return res;
 	}
 
-	void __global__ scalor_sub(
+	static void __global__ scalor_sub(
 		float*res,
 		float*const left,
 		float*const right,
@@ -161,7 +161,7 @@ namespace LibMatchstick{
 		return*this;
 	}
 
-	void __global__ scalor_mul(
+	static void __global__ scalor_mul(
 		float*res,
 		float*const left,
 		float*const right,
@@ -186,7 +186,7 @@ namespace LibMatchstick{
 		return res;
 	}
 
-	void __global__ vector_dot(
+	static void __global__ vector_dot(
 		float*res,
 		float*const left,
 		float*const right,
@@ -239,7 +239,7 @@ namespace LibMatchstick{
 		return data;
 	}
 
-	void __global__ scalor_transpose(const float*from,float*to,size_t h,size_t w){
+	static void __global__ scalor_transpose(const float*from,float*to,size_t h,size_t w){
 		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 		if(i<h&&j<w){
@@ -258,7 +258,7 @@ namespace LibMatchstick{
 		return res;
 	}
 
-	void __global__ mul(float*res,const float*left,float right,size_t h,size_t w){
+	static void __global__ mul(float*res,const float*left,float right,size_t h,size_t w){
 		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 		if(i<h&&j<w)
@@ -280,7 +280,7 @@ namespace LibMatchstick{
 		return b*a;
 	}
 
-	void __global__ self_mul(float*left,float right,size_t h,size_t w){
+	static void __global__ self_mul(float*left,float right,size_t h,size_t w){
 		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 		if(i<h&&j<w)

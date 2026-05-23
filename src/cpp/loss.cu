@@ -43,7 +43,7 @@ namespace LibMatchstick{
 			return sum/(w*h);
 		}
 
-		void __global__ scalor_MAE_d(float scale,const float*x,const float*e,float*res,size_t h,size_t w){
+		static void __global__ scalor_MAE_d(float scale,const float*x,const float*e,float*res,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			if(i<h&&j<w){
@@ -89,7 +89,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_cross_entropy_d(const float*x,const float*e,float*res,size_t h,size_t w){
+		static void __global__ scalor_cross_entropy_d(const float*x,const float*e,float*res,size_t h,size_t w){
 			const float eps=1e-12;
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;

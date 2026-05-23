@@ -189,7 +189,7 @@ namespace LibMatchstick{
 		free(tmp_b);
 	}
 
-	void __global__ add_bias(float*b,float*res,size_t o_c,size_t o_h,size_t o_w){
+	static void __global__ add_bias(float*b,float*res,size_t o_c,size_t o_h,size_t o_w){
 		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
@@ -214,7 +214,7 @@ namespace LibMatchstick{
 		return res;
 	}
 
-	void __global__ get_dl_da(
+	static void __global__ get_dl_da(
 		float*kernel,
 		float*res,
 		float*dl_dz,
@@ -263,7 +263,7 @@ namespace LibMatchstick{
 								];
 	}
 
-	void __global__ grad_update_ker(
+	static void __global__ grad_update_ker(
 		float*kernel,
 		float*dl_dz,
 		float*last_input,
@@ -310,7 +310,7 @@ namespace LibMatchstick{
 								);
 	}
 
-	void __global__ grad_update_bias(
+	static void __global__ grad_update_bias(
 		float*b,
 		float*dl_dz,
 		size_t o_c,

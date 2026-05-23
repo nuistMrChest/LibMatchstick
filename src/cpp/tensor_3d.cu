@@ -110,7 +110,7 @@ namespace LibMatchstick{
 		return*this;
 	}
 
-	void __global__ scalor_add(
+	static void __global__ scalor_add(
 		float*res,
 		float*const left,
 		float*const right,
@@ -140,7 +140,7 @@ namespace LibMatchstick{
 		return res;
 	}
 
-	void __global__ scalor_sub(
+	static void __global__ scalor_sub(
 		float*res,
 		float*const left,
 		float*const right,
@@ -196,7 +196,7 @@ namespace LibMatchstick{
 		return*this;
 	}
 
-	void __global__ scalor_mul(
+	static void __global__ scalor_mul(
 		float*res,
 		float*const left,
 		float*const right,
@@ -246,7 +246,7 @@ namespace LibMatchstick{
 		return data;
 	}
 
-	void __global__ dot(
+	static void __global__ dot(
 		float*res,
 		const float*ten,
 		const float*ker,

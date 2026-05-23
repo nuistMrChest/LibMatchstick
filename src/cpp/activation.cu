@@ -3,7 +3,7 @@
 
 namespace LibMatchstick{
 	namespace Activation{
-		void __global__ scalor_relu(const float*from,float*to,size_t h,size_t w){
+		static void __global__ scalor_relu(const float*from,float*to,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			if(i<h&&j<w)
@@ -21,7 +21,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_relu_d(const float*from,float*to,size_t h,size_t w){
+		static void __global__ scalor_relu_d(const float*from,float*to,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			if(i<h&&j<w)
@@ -39,7 +39,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_leaky_relu(const float*from,float*to,size_t h,size_t w){
+		static void __global__ scalor_leaky_relu(const float*from,float*to,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			if(i<h&&j<w)
@@ -57,7 +57,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_leaky_relu_d(const float*from,float*to,size_t h,size_t w){
+		static void __global__ scalor_leaky_relu_d(const float*from,float*to,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			if(i<h&&j<w)
@@ -75,7 +75,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_sigmoid(const float*from,float*to,size_t h,size_t w){
+		static void __global__ scalor_sigmoid(const float*from,float*to,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			if(i<h&&j<w)
@@ -93,7 +93,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_sigmoid_d(const float*from,float*to,size_t h,size_t w){
+		static void __global__ scalor_sigmoid_d(const float*from,float*to,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			if(i<h&&j<w){
@@ -114,7 +114,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_tanh(const float*from,float*to,size_t h,size_t w){
+		static void __global__ scalor_tanh(const float*from,float*to,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			if(i<h&&j<w)
@@ -132,7 +132,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_tanh_d(const float*from,float*to,size_t h,size_t w){
+		static void __global__ scalor_tanh_d(const float*from,float*to,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			if(i<h&&j<w){
@@ -156,7 +156,7 @@ namespace LibMatchstick{
 			return a;
 		}
 
-		void __global__ scalor_identity_d(
+		static void __global__ scalor_identity_d(
 			float*to,
 			size_t h,
 			size_t w
@@ -178,7 +178,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ matrix_softmax(const float*from,float*to,size_t h,size_t w){
+		static void __global__ matrix_softmax(const float*from,float*to,size_t h,size_t w){
 			float mx=-INFINITY;
 			for(size_t i=0;i<h;i++)
 				for(size_t j=0;j<w;j++)
@@ -200,7 +200,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ matrix_softmax_d(const float*from,float*to,size_t h,size_t w){
+		static void __global__ matrix_softmax_d(const float*from,float*to,size_t h,size_t w){
 			for(size_t i=0;i<h;i++)
 				for(size_t j=0;j<w;j++)
 					to[i*w+j]=from[i*w+j]*(1-from[i*w+j]);
@@ -213,7 +213,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_relu_t(const float*from,float*to,size_t c,size_t h,size_t w){
+		static void __global__ scalor_relu_t(const float*from,float*to,size_t c,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
@@ -233,7 +233,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_relu_t_d(const float*from,float*to,size_t c,size_t h,size_t w){
+		static void __global__ scalor_relu_t_d(const float*from,float*to,size_t c,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
@@ -253,7 +253,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_leaky_relu_t(const float*from,float*to,size_t c,size_t h,size_t w){
+		static void __global__ scalor_leaky_relu_t(const float*from,float*to,size_t c,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
@@ -279,7 +279,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_leaky_relu_t_d(const float*from,float*to,size_t c,size_t h,size_t w){
+		static void __global__ scalor_leaky_relu_t_d(const float*from,float*to,size_t c,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
@@ -305,7 +305,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_sigmoid_t(const float*from,float*to,size_t c,size_t h,size_t w){
+		static void __global__ scalor_sigmoid_t(const float*from,float*to,size_t c,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
@@ -325,7 +325,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_sigmoid_t_d(const float*from,float*to,size_t c,size_t h,size_t w){
+		static void __global__ scalor_sigmoid_t_d(const float*from,float*to,size_t c,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
@@ -354,7 +354,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_tanh_t(const float*from,float*to,size_t c,size_t h,size_t w){
+		static void __global__ scalor_tanh_t(const float*from,float*to,size_t c,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
@@ -380,7 +380,7 @@ namespace LibMatchstick{
 			return res;
 		}
 
-		void __global__ scalor_tanh_t_d(const float*from,float*to,size_t c,size_t h,size_t w){
+		static void __global__ scalor_tanh_t_d(const float*from,float*to,size_t c,size_t h,size_t w){
 			size_t i=blockIdx.x*blockDim.x+threadIdx.x;
 			size_t j=blockIdx.y*blockDim.y+threadIdx.y;
 			size_t k=blockIdx.z*blockDim.z+threadIdx.z;
@@ -412,7 +412,7 @@ namespace LibMatchstick{
 			return a;
 		}
 
-		void __global__ scalor_identity_t_d(
+		static void __global__ scalor_identity_t_d(
 			float*to,
 			size_t c,
 			size_t h,
