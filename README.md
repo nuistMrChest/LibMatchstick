@@ -1,76 +1,112 @@
 # LibMatchstick
 
-LibMatchstick is a lightweight C++ / CUDA neural network library.
+LibMatchstick is a lightweight C++ / CUDA neural-network library for learning, experimentation, and small course-project style models.
 
-It is designed as a small self-contained framework for learning, experimentation, and course projects. The library currently focuses on basic neural network components, especially MLP and CNN workflows, while keeping the API relatively simple and explicit.
+Version **2.0.0** keeps the original C++ interface, adds a new opaque-handle based **C API**, and slightly reorganizes the public C++ API layout.
 
 ---
 
 ## Features
 
+- CUDA-backed implementation
+- C++ API for direct use from C++ projects
+- C API for C projects and FFI bindings
 - Matrix container
-- 3D tensor container
-- 4D tensor container
-- Basic matrix operations
-- Basic tensor operations
-- CUDA-backed computation in the implementation
-- Common activation functions
+- 3D tensor container using `channel × height × width`
+- 4D tensor container using `batch × channel × height × width`
+- Basic matrix and tensor operations
+- MLP layers and MLP network wrapper
+- CNN layers and CNN network wrapper
+- Common activation functions:
   - ReLU
   - Leaky ReLU
   - Sigmoid
   - Tanh
   - Identity
   - Softmax for matrix output
-- Common loss functions
+- Common loss functions:
   - Mean Squared Error
   - Mean Absolute Error
   - Cross Entropy
-- Fully connected layer
-- Convolution layer
-- MLP network wrapper
-- CNN network wrapper
 - Parameter save/load interfaces for weights, biases, and kernels
 
 ---
 
-## Project Status
+## Version 2.0.0 Changes
 
-LibMatchstick is currently a small experimental neural network library.
+Compared with v1.0.0, v2.0.0 mainly introduces the C API and makes small C++ API adjustments.
 
-The current API is suitable for:
+### New C API
 
-- Simple MLP experiments
-- Small CNN experiments
-- Classification tasks
-- Educational neural network implementation
-- CUDA learning and demonstration
-- Course project demonstration
+v2.0.0 adds public C headers under:
 
-It is not intended to replace mature machine learning frameworks such as PyTorch, TensorFlow, or ONNX Runtime.
+```text
+include/matchstick_c/
+├── matchstick.h
+├── matrix.h
+├── tensor_3d.h
+├── tensor_4d.h
+└── network.h
+```
+
+The C API uses opaque handles such as:
+
+```c
+matchstick_matrix
+matchstick_tensor_3d
+matchstick_tensor_4d
+matchstick_mlp
+matchstick_cnn
+```
+
+These handles are suitable for C programs and for language bindings through FFI.
+
+### C++ API Adjustments
+
+Public C++ headers are now placed under:
+
+```text
+include/matchstick/
+```
+
+Use the new include style:
+
+```cpp
+#include <matchstick/matrix.h>
+#include <matchstick/tensor_3d.h>
+#include <matchstick/tensor_4d.h>
+#include <matchstick/activation.h>
+#include <matchstick/loss.h>
+#include <matchstick/layer.h>
+#include <matchstick/network.h>
+```
+
+The loss namespace and header have also been adjusted:
+
+| v1.0.0 style | v2.0.0 style |
+|---|---|
+| `#include "losses.h"` | `#include <matchstick/loss.h>` |
+| `LibMatchstick::Losses` | `LibMatchstick::Loss` |
 
 ---
 
 ## Repository Layout
 
-Recommended layout:
-
 ```text
 LibMatchstick/
 ├── include/
-│   ├── matrix.h
-│   ├── tensor_3d.h
-│   ├── tensor_4d.h
-│   ├── activation.h
-│   ├── losses.h
-│   ├── layer.h
-│   └── network.h
+│   ├── matchstick/          # C++ public API
+│   └── matchstick_c/        # C public API
 ├── src/
+│   ├── cpp/                 # C++ / CUDA implementation
+│   └── c_api/               # C API wrapper implementation
 ├── docs/
-│   └── API.md
+│   ├── API.md               # C++ API reference
+│   └── API_C.md             # C API reference
+├── CMakeLists.txt
 ├── LICENSE
 ├── COPYING
 ├── COPYING.LESSER
-├── CMakeLists.txt
 └── README.md
 ```
 
@@ -78,82 +114,83 @@ LibMatchstick/
 
 ## Requirements
 
-The exact requirements depend on how the library is built on your system.
-
 Common requirements:
 
-- CMake
+- CMake 3.24 or newer
 - CUDA Toolkit
 - A CUDA-capable GPU
-- A compiler supported by your CUDA Toolkit
+- A C++17 compiler supported by your CUDA Toolkit
 
-On Linux, typical compilers include:
+The project is built as a shared library target named `matchstick`.
 
-- GCC
-- Clang
-- NVCC with a supported host compiler
+On Linux, the output is typically:
+
+```text
+libmatchstick.so
+```
 
 ---
 
 ## Build
-
-A common CMake build flow is:
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ```
 
-The generated library is usually placed somewhere under the `build/` directory, depending on the current `CMakeLists.txt`.
+The current CMake project enables CUDA and builds the shared library target `matchstick`.
 
-For example, the result may be a shared library such as:
+If you need to choose a CUDA architecture manually, pass `CMAKE_CUDA_ARCHITECTURES`:
 
-```text
-libmatchstick.so
+```bash
+cmake -S . -B build \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_CUDA_ARCHITECTURES=86
+cmake --build build -j
 ```
 
-on Linux
+If your CUDA Toolkit does not support your default host compiler, select a supported host compiler through your build environment or CMake toolchain settings.
 
 ---
 
-## Using LibMatchstick
+## Using LibMatchstick from C++
 
-To use LibMatchstick in another C++ project, include the public headers and link against the generated library.
-
-Example include usage:
+### Include Headers
 
 ```cpp
-#include "matrix.h"
-#include "tensor_3d.h"
-#include "activation.h"
-#include "losses.h"
-#include "network.h"
+#include <matchstick/matrix.h>
+#include <matchstick/tensor_3d.h>
+#include <matchstick/tensor_4d.h>
+#include <matchstick/activation.h>
+#include <matchstick/loss.h>
+#include <matchstick/layer.h>
+#include <matchstick/network.h>
 ```
 
-If you are using CMake manually, the basic idea is:
+### CMake Example
 
 ```cmake
 target_include_directories(your_target PRIVATE /path/to/LibMatchstick/include)
 target_link_libraries(your_target PRIVATE /path/to/libmatchstick.so)
 ```
 
-Adjust the library path and file name according to your platform and build output.
+Adjust the library path according to your build output.
 
 ---
 
-## Minimal MLP Example
+## Minimal C++ MLP Example
 
 ```cpp
-#include "matrix.h"
-#include "activation.h"
-#include "losses.h"
-#include "network.h"
+#include <matchstick/matrix.h>
+#include <matchstick/activation.h>
+#include <matchstick/loss.h>
+#include <matchstick/network.h>
 
 #include <iostream>
 
 using namespace LibMatchstick;
 using namespace LibMatchstick::Activation;
-using namespace LibMatchstick::Losses;
+using namespace LibMatchstick::Loss;
 
 int main() {
     MLP net(2, 0.01f);
@@ -182,11 +219,10 @@ int main() {
 
     Matrix grad;
     float loss = net.train(input, expected, grad);
-
     Matrix output = net.use(input);
 
-    std::cout << "loss = " << loss << std::endl;
-    std::cout << output << std::endl;
+    std::cout << "loss = " << loss << '\n';
+    std::cout << output << '\n';
 
     return 0;
 }
@@ -194,20 +230,20 @@ int main() {
 
 ---
 
-## Minimal CNN Example
+## Minimal C++ CNN Example
 
 ```cpp
-#include "matrix.h"
-#include "tensor_3d.h"
-#include "activation.h"
-#include "losses.h"
-#include "network.h"
+#include <matchstick/matrix.h>
+#include <matchstick/tensor_3d.h>
+#include <matchstick/activation.h>
+#include <matchstick/loss.h>
+#include <matchstick/network.h>
 
 #include <iostream>
 
 using namespace LibMatchstick;
 using namespace LibMatchstick::Activation;
-using namespace LibMatchstick::Losses;
+using namespace LibMatchstick::Loss;
 
 int main() {
     CNN net(2, 0.001f, 2, 0.01f);
@@ -253,11 +289,10 @@ int main() {
     expected.set(3, 0, 1.0f);
 
     float loss = net.train(input, expected);
-
     Matrix output = net.use(input);
 
-    std::cout << "loss = " << loss << std::endl;
-    std::cout << output << std::endl;
+    std::cout << "loss = " << loss << '\n';
+    std::cout << output << '\n';
 
     return 0;
 }
@@ -265,90 +300,147 @@ int main() {
 
 ---
 
+## Using LibMatchstick from C
+
+### Include Header
+
+The recommended C include is:
+
+```c
+#include <matchstick_c/matchstick.h>
+```
+
+This umbrella header includes the matrix, tensor, and network C APIs.
+
+### Minimal C MLP Example
+
+```c
+#include <matchstick_c/matchstick.h>
+
+#include <stdio.h>
+
+int main(void) {
+    matchstick_mlp net = init_matchstick_mlp(2, 0.01f);
+
+    set_layer_matchstick_mlp(net, 0, 2, 4);
+    set_layer_matchstick_mlp(net, 1, 4, 2);
+
+    set_layer_activation_matchstick_mlp(net, 0, matchstick_activation_sigmoid);
+    set_layer_activation_matchstick_mlp(net, 1, matchstick_activation_softmax);
+
+    set_loss_matchstick_mlp(net, matchstick_loss_ce);
+    set_sm_matchstick_mlp(net);
+    set_ce_matchstick_mlp(net);
+
+    shuffle_matchstick_mlp(net, 0.5f, -0.5f);
+
+    float input_data[] = {
+        1.0f,
+        0.0f
+    };
+
+    float expected_data[] = {
+        0.0f,
+        1.0f
+    };
+
+    float grad_data[] = {
+        0.0f,
+        0.0f
+    };
+
+    matchstick_matrix input = init_matchstick_matrix(2, 1, input_data);
+    matchstick_matrix expected = init_matchstick_matrix(2, 1, expected_data);
+    matchstick_matrix grad = init_matchstick_matrix(2, 1, grad_data);
+
+    float loss = train_matchstick_mlp(net, input, expected, grad);
+    matchstick_matrix output = use_matchstick_mlp(net, input);
+
+    printf("loss = %f\n", loss);
+    print_matchstick_matrix(output);
+
+    free_matchstick_matrix(output);
+    free_matchstick_matrix(grad);
+    free_matchstick_matrix(expected);
+    free_matchstick_matrix(input);
+    free_matchstick_mlp(net);
+
+    return 0;
+}
+```
+
+---
+
+## C API Memory Ownership Rules
+
+The C API uses opaque handles. Users should not access the internal fields of these objects and should not release them with plain `free()`.
+
+Every `matchstick_*` handle returned by LibMatchstick must be released with the matching `free_matchstick_*` function.
+
+| Returned object | Correct release function |
+|---|---|
+| `matchstick_matrix` | `free_matchstick_matrix()` |
+| `matchstick_tensor_3d` | `free_matchstick_tensor_3d()` |
+| `matchstick_tensor_4d` | `free_matchstick_tensor_4d()` |
+| `matchstick_mlp` | `free_matchstick_mlp()` |
+| `matchstick_cnn` | `free_matchstick_cnn()` |
+
+Special case:
+
+```c
+float *bias = save_bias_matchstick_cnn(cnn, layer_index, out_c);
+
+/* use bias[0] ... bias[out_c - 1] */
+
+free(bias);
+```
+
+`save_bias_matchstick_cnn()` returns a plain heap buffer created with `malloc`, so it must be released with standard C `free()`.
+
+Do not pass this pointer to any `free_matchstick_*` function.
+
+---
+
 ## API Overview
 
-LibMatchstick exposes the following main modules.
-
-### Core Containers
-
-| Type | Description |
-|---|---|
-| `Matrix` | 2D floating-point matrix |
-| `Tensor2d` | Alias of `Matrix` |
-| `Tensor3d` | 3D tensor using `channel x height x width` layout |
-| `Tensor4d` | 4D tensor using `batch x channel x height x width` layout |
-
-### Activation Functions
-
-Namespace:
-
-```cpp
-LibMatchstick::Activation
-```
-
-Matrix activation functions:
-
-- `relu`
-- `relu_d`
-- `leaky_relu`
-- `leaky_relu_d`
-- `sigmoid`
-- `sigmoid_d`
-- `tanh`
-- `tanh_d`
-- `identity`
-- `identity_d`
-- `softmax`
-- `softmax_d`
-
-Tensor activation functions:
-
-- `relu_t`
-- `relu_t_d`
-- `leaky_relu_t`
-- `leaky_relu_t_d`
-- `sigmoid_t`
-- `sigmoid_t_d`
-- `tanh_t`
-- `tanh_t_d`
-- `identity_t`
-- `identity_t_d`
-
-### Loss Functions
-
-Namespace:
-
-```cpp
-LibMatchstick::Losses
-```
-
-Available loss functions:
-
-- `MSE`
-- `MSE_d`
-- `MAE`
-- `MAE_d`
-- `cross_entropy`
-- `cross_entropy_d`
-
-### Layers
-
-| Type | Description |
-|---|---|
-| `MLPLayer` | Fully connected layer |
-| `CNNLayer` | Convolution layer |
-
-### Networks
-
-| Type | Description |
-|---|---|
-| `MLP` | Multi-layer perceptron wrapper |
-| `CNN` | Convolutional neural network wrapper with internal MLP |
-
-For full API details, see:
+### C++ API Headers
 
 ```text
-docs/API.md
+include/matchstick/matrix.h
+include/matchstick/tensor_3d.h
+include/matchstick/tensor_4d.h
+include/matchstick/activation.h
+include/matchstick/loss.h
+include/matchstick/layer.h
+include/matchstick/network.h
+```
+
+Main C++ namespace:
+
+```cpp
+namespace LibMatchstick;
+namespace LibMatchstick::Activation;
+namespace LibMatchstick::Loss;
+```
+
+### C API Headers
+
+```text
+include/matchstick_c/matchstick.h
+include/matchstick_c/matrix.h
+include/matchstick_c/tensor_3d.h
+include/matchstick_c/tensor_4d.h
+include/matchstick_c/network.h
+```
+
+Main C API object handles:
+
+```c
+matchstick_matrix
+matchstick_tensor_3d
+matchstick_tensor_4d
+matchstick_mlp
+matchstick_cnn
 ```
 
 ---
@@ -358,58 +450,45 @@ docs/API.md
 ### Matrix
 
 ```text
-height x width
+height × width
 ```
 
 MLP inputs and outputs usually use column vectors:
 
 ```text
-n x 1
+n × 1
 ```
 
 ### Tensor3d
 
 ```text
-channel x height x width
+channel × height × width
 ```
 
-Example:
+Examples:
 
 ```text
-1 x 28 x 28
-3 x 224 x 224
+1 × 28 × 28
+3 × 224 × 224
 ```
 
 ### Tensor4d
 
 ```text
-batch x channel x height x width
+batch × channel × height × width
 ```
 
 For convolution kernels, `Tensor4d` is usually interpreted as:
 
 ```text
-out_channel x in_channel x kernel_height x kernel_width
+out_channel × in_channel × kernel_height × kernel_width
 ```
 
 ---
 
-## Notes
+## CNN Output Shape
 
-### CUDA Memory
-
-Some implementations may store data in CUDA device memory.
-
-Therefore, pointers returned by `getData()` should be used carefully:
-
-- Do not manually free them.
-- Do not use them after the object is destroyed.
-- Do not assume they are directly accessible from CPU code.
-- Prefer the public APIs such as `set`, `get`, `saveWeight`, `loadWeight`, `saveKernel`, and `loadKernel`.
-
-### CNN Output Shape
-
-The current API requires users to explicitly provide output height and width for convolution layers.
+The current CNN layer API requires users to explicitly provide the output height and output width.
 
 For standard convolution:
 
@@ -418,11 +497,13 @@ out_h = floor((in_h + 2 * padding - kernel_h) / stride) + 1
 out_w = floor((in_w + 2 * padding - kernel_w) / stride) + 1
 ```
 
-Users should make sure the provided output shape is consistent with the convolution configuration.
+Make sure the output shape passed to `setLayer()` or `set_layer_matchstick_cnn()` is consistent with the convolution configuration.
 
-### Softmax and Cross Entropy
+---
 
-For classification tasks, the recommended output-layer setup is:
+## Softmax and Cross Entropy
+
+For classification tasks using C++ `MLP`, the recommended output-layer setup is:
 
 ```cpp
 net.setLayerActivation(last, softmax, softmax_d);
@@ -431,7 +512,7 @@ net.setSm();
 net.setCe();
 ```
 
-For `CNN`, configure the internal MLP in the same way:
+For C++ `CNN`, configure the internal MLP in the same way:
 
 ```cpp
 net.mlp().setLayerActivation(last, softmax, softmax_d);
@@ -440,15 +521,44 @@ net.mlp().setSm();
 net.mlp().setCe();
 ```
 
+For the C API:
+
+```c
+set_layer_activation_matchstick_mlp(net, last, matchstick_activation_softmax);
+set_loss_matchstick_mlp(net, matchstick_loss_ce);
+set_sm_matchstick_mlp(net);
+set_ce_matchstick_mlp(net);
+```
+
 ---
 
 ## Documentation
 
-Full API documentation is available in:
+Full API references are available in:
 
 ```text
 docs/API.md
+docs/API_C.md
 ```
+
+For v2.0.0, the C API is part of the public interface and should be documented together with the C++ API.
+
+---
+
+## Project Status
+
+LibMatchstick is an educational and experimental project.
+
+It is suitable for:
+
+- Simple MLP experiments
+- Small CNN experiments
+- Classification demos
+- CUDA learning
+- Neural-network implementation practice
+- Course project demonstrations
+
+It is not intended to replace mature machine-learning frameworks such as PyTorch, TensorFlow, ONNX Runtime, or TensorRT.
 
 ---
 
@@ -456,17 +566,25 @@ docs/API.md
 
 LibMatchstick is licensed under the GNU Lesser General Public License v3.0 or later.
 
+SPDX identifier:
+
+```text
+LGPL-3.0-or-later
+```
+
 See:
 
-- `LICENSE`
-- `COPYING`
-- `COPYING.LESSER`
+```text
+LICENSE
+COPYING
+COPYING.LESSER
+```
 
 ---
 
 ## Disclaimer
 
-LibMatchstick is an educational and experimental project.
+This library is provided for learning, demonstration, and small-scale experimentation.
 
-It is intended for learning, demonstration, and small-scale experiments. It does not provide the same level of optimization, model coverage, numerical robustness, or ecosystem integration as mature machine learning frameworks.
+It does not provide the same level of optimization, model coverage, numerical robustness, tooling, or ecosystem integration as mature machine-learning frameworks.
 
