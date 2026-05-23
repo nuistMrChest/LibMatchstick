@@ -1,45 +1,32 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#ifndef MATRIX_C_H
+#define MATRIX_C_H
 
-#include<stddef.h>
-#include<initializer_list>
-#include<iostream>
-
-namespace LibMatchstick{
-	class Matrix{
-	private:
-		float*data;
-		size_t h,w;
-	public:
-		Matrix();
-		Matrix(size_t h,size_t w);
-		Matrix(std::initializer_list<std::initializer_list<float>>a);
-		~Matrix();
-		friend std::ostream&operator<<(std::ostream&os,const Matrix&a);
-		size_t getHeight()const;
-		size_t getWidth()const;
-		void resize(size_t h,size_t w);
-		Matrix(const Matrix&a);
-		Matrix&operator=(const Matrix&a);
-		Matrix operator+(const Matrix&a)const;
-		Matrix operator-(const Matrix&a)const;
-		Matrix&operator+=(const Matrix&a);
-		Matrix&operator-=(const Matrix&a);
-		Matrix hadamard(const Matrix&a)const;
-		Matrix operator*(const Matrix&a)const;
-		void set(size_t i,size_t j,float v);
-		float get(size_t i,size_t j)const;
-		float*getData();
-		const float*getData()const;
-		Matrix transpose()const;
-		Matrix operator*(float a)const;
-		Matrix operator*=(float a);
-		friend Matrix operator*(float a,const Matrix&b);
-	};
-
-	typedef Matrix Tensor2d;
-}
-
+#ifdef __cplusplus
+extern "C"{
 #endif
 
+	#include<stddef.h>
 
+	struct matchstick_matrix_impl;
+
+	typedef struct matchstick_matrix_impl matchstick_matrix_impl;
+
+	typedef matchstick_matrix_impl*matchstick_matrix;
+
+	matchstick_matrix init_matcistick_matrix(size_t h,size_t w,float*v);
+
+	void free_matchstick_matrix(matchstick_matrix a);
+
+	void print_matchstick_matrix(matchstick_matrix a);
+
+	size_t get_height_matchstick_matrix(matchstick_matrix a);
+
+	size_t get_width_matchstick_matrix(matchstick_matrix a);
+
+	void assignment_matcistich_matrix(matchstick_matrix to,matchstick_matrix from);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

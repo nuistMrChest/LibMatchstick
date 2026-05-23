@@ -4,7 +4,7 @@
 namespace LibMatchstick{
 	class Matrix;
 
-	namespace Losses{
+	namespace Loss{
 		float MSE(const Matrix&x,const Matrix&e);
 		Matrix MSE_d(const Matrix&x,const Matrix&e);
 		float MAE(const Matrix&x,const Matrix&e);

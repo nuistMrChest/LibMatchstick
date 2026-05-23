@@ -1,5 +1,5 @@
-#include"../include/losses.h"
-#include"../include/matrix.h"
+#include"../../internal/losses.h"
+#include"../../internal/matrix.h"
 
 namespace LibMatchstick{
 	namespace Losses{

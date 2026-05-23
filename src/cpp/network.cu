@@ -1,17 +1,17 @@
-#include"../include/network.h"
-#include"../include/matrix.h"
-#include"../include/layer.h"
-#include"../include/losses.h"
-#include"../include/tensor_3d.h"
-#include"../include/tensor_4d.h"
+#include"../../internal/network.h"
+#include"../../internal/matrix.h"
+#include"../../internal/layer.h"
+#include"../../internal/loss.h"
+#include"../../internal/tensor_3d.h"
+#include"../../internal/tensor_4d.h"
 
 namespace LibMatchstick{
 	MLP::MLP():
 		ce(false),
 		step(0)
 	{
-		loss=Losses::MSE;
-		loss_d=Losses::MSE_d;
+		loss=Loss::MSE;
+		loss_d=Loss::MSE_d;
 	}
 
 	MLP::MLP(size_t layer_size,float step):
@@ -19,8 +19,8 @@ namespace LibMatchstick{
 		step(step)
 	{
 		layers.resize(layer_size);
-		loss=Losses::MSE;
-		loss_d=Losses::MSE_d;
+		loss=Loss::MSE;
+		loss_d=Loss::MSE_d;
 	}
 
 	void MLP::setLayer(size_t index,size_t in_size,size_t out_size){

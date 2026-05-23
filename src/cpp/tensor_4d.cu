@@ -1,4 +1,4 @@
-#include"../include/tensor_4d.h"
+#include"../../internal/tensor_4d.h"
 #include <cstdlib>
 
 namespace LibMatchstick{
