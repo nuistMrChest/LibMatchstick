@@ -58,7 +58,7 @@ namespace LibMatchstick{
 		float*tmp_W=(float*)malloc(W->getWidth()*W->getHeight()*sizeof(float));
 		float*tmp_b=(float*)malloc(b->getWidth()*b->getHeight()*sizeof(float));
 		static std::mt19937 rng(std::random_device{}());
-		std::uniform_real_distribution<float>dist(high,low);
+		std::uniform_real_distribution<float>dist(low,high);
 		for(size_t i=0;i<out_size;i++){
 			for(size_t j=0;j<in_size;j++)
 				tmp_W[i*in_size+j]=dist(rng);
@@ -165,7 +165,7 @@ namespace LibMatchstick{
 		);
 		float*tmp_b=(float*)malloc(out_c*sizeof(float));
 		static std::mt19937 rng(std::random_device{}());
-		std::uniform_real_distribution<float>dist(high,low);
+		std::uniform_real_distribution<float>dist(low,high);
 		for(size_t i=0;i<out_c;i++){
 			for(size_t j=0;j<kernel->getChannel();j++)
 				for(size_t k=0;k<kernel->getHeight();k++)
