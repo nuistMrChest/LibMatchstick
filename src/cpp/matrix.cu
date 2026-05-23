@@ -1,4 +1,4 @@
-#include"../../internal/matrix.h"
+#include"../../include/matchstick/matrix.h"
 #include <cstdlib>
 #include<cuda_runtime.h>
 #include<stdlib.h>

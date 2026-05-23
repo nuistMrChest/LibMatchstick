@@ -1,9 +1,9 @@
-#include"../../internal/network.h"
-#include"../../internal/matrix.h"
-#include"../../internal/layer.h"
-#include"../../internal/loss.h"
-#include"../../internal/tensor_3d.h"
-#include"../../internal/tensor_4d.h"
+#include"../../include/matchstick/network.h"
+#include"../../include/matchstick/matrix.h"
+#include"../../include/matchstick/layer.h"
+#include"../../include/matchstick/loss.h"
+#include"../../include/matchstick/tensor_3d.h"
+#include"../../include/matchstick/tensor_4d.h"
 
 namespace LibMatchstick{
 	MLP::MLP():

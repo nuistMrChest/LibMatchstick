@@ -1,8 +1,8 @@
 #ifndef NETWORK_CAPI_H
 #define NETWORK_CAPI_H
 
-#include"../../include/network.h"
-#include"../../internal/network.h"
+#include"../../include/matchstick_c/network.h"
+#include"../../include/matchstick/network.h"
 
 struct matchstick_mlp_impl{
 	LibMatchstick::MLP m;

@@ -40,22 +40,7 @@ set_target_properties(matchstick PROPERTIES
     CUDA_RESOLVE_DEVICE_SYMBOLS ON
 )
 
-target_include_directories(matchstick
-    BEFORE PRIVATE
-        ${PROJECT_SOURCE_DIR}/internal
-        ${PROJECT_SOURCE_DIR}/src/c_api
-)
-
-target_include_directories(matchstick
-    PUBLIC
-        ${PROJECT_SOURCE_DIR}/include
-)
-
 target_link_libraries(matchstick
     PRIVATE
         CUDA::cudart
-)
-
-install(DIRECTORY include/
-    DESTINATION include
 )

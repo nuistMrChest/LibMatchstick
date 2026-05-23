@@ -8,7 +8,7 @@ This document describes the public API declared in the current header files:
 - `tensor_3d.h`
 - `tensor_4d.h`
 - `activation.h`
-- `losses.h`
+- `loss.h`
 - `layer.h`
 - `network.h`
 
@@ -27,7 +27,7 @@ This document describes the public API declared in the current header files:
 - [Activation Functions](#activation-functions)
   - [`LibMatchstick::Activation`](#libmatchstickactivation)
 - [Loss Functions](#loss-functions)
-  - [`LibMatchstick::Losses`](#libmatchsticklosses)
+  - [`LibMatchstick::Loss`](#libmatchstickloss)
 - [Layers](#layers)
   - [`MLPLayer`](#mlplayer)
   - [`CNNLayer`](#cnnlayer)
@@ -62,7 +62,7 @@ namespace LibMatchstick::Activation
 Loss functions are declared under:
 
 ```cpp
-namespace LibMatchstick::Losses
+namespace LibMatchstick::Loss
 ```
 
 Typical usage:
@@ -70,7 +70,7 @@ Typical usage:
 ```cpp
 using namespace LibMatchstick;
 using namespace LibMatchstick::Activation;
-using namespace LibMatchstick::Losses;
+using namespace LibMatchstick::Loss;
 ```
 
 ---
@@ -1054,18 +1054,18 @@ Tensor3d dy = relu_t_d(x);
 
 # Loss Functions
 
-## `LibMatchstick::Losses`
+## `LibMatchstick::Loss`
 
 Header:
 
 ```cpp
-#include "losses.h"
+#include "loss.h"
 ```
 
 Namespace:
 
 ```cpp
-namespace LibMatchstick::Losses
+namespace LibMatchstick::Loss
 ```
 
 This module provides common loss functions and their derivatives.
@@ -1131,7 +1131,7 @@ Example:
 
 ```cpp
 using namespace LibMatchstick;
-using namespace LibMatchstick::Losses;
+using namespace LibMatchstick::Loss;
 
 Matrix output = {
     {0.1f},
@@ -1734,7 +1734,7 @@ Sets the loss function and its derivative.
 Example:
 
 ```cpp
-using namespace LibMatchstick::Losses;
+using namespace LibMatchstick::Loss;
 
 m.setLoss(MSE, MSE_d);
 ```
@@ -2122,14 +2122,14 @@ net.init(0.1f, -0.1f);
 ```cpp
 #include "matrix.h"
 #include "activation.h"
-#include "losses.h"
+#include "loss.h"
 #include "network.h"
 
 #include <iostream>
 
 using namespace LibMatchstick;
 using namespace LibMatchstick::Activation;
-using namespace LibMatchstick::Losses;
+using namespace LibMatchstick::Loss;
 
 int main() {
     MLP net(2, 0.01f);
@@ -2176,14 +2176,14 @@ int main() {
 #include "matrix.h"
 #include "tensor_3d.h"
 #include "activation.h"
-#include "losses.h"
+#include "loss.h"
 #include "network.h"
 
 #include <iostream>
 
 using namespace LibMatchstick;
 using namespace LibMatchstick::Activation;
-using namespace LibMatchstick::Losses;
+using namespace LibMatchstick::Loss;
 
 int main() {
     CNN net(2, 0.001f, 2, 0.01f);
@@ -2480,7 +2480,7 @@ LibMatchstick/
 │   ├── tensor_3d.h
 │   ├── tensor_4d.h
 │   ├── activation.h
-│   ├── losses.h
+│   ├── loss.h
 │   ├── layer.h
 │   └── network.h
 ├── src/

@@ -1,4 +1,4 @@
-#include"../../internal/activation.h"
+#include"../../include/matchstick/activation.h"
 #include <cmath>
 
 namespace LibMatchstick{
