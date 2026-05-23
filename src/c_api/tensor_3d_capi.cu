@@ -1,7 +1,7 @@
 #include<iostream>
 #include"tensor_3d_capi.h"
 
-matchstick_tensor_3d init_matcistick_tensor_3d(size_t c,size_t h,size_t w,float*v){
+matchstick_tensor_3d init_matchstick_tensor_3d(size_t c,size_t h,size_t w,float*v){
 	matchstick_tensor_3d a=new matchstick_tensor_3d_impl();
 	a->t=LibMatchstick::Tensor3d(c,h,w);
 	cudaMemcpy(a->t.getData(),v,c*h*w*sizeof(float),cudaMemcpyHostToDevice);
@@ -28,6 +28,6 @@ size_t get_width_matchstick_tensor_3d(matchstick_tensor_3d a){
 	return a->t.getWidth();
 }
 
-void assignment_matcistick_tensor_3d(matchstick_tensor_3d to,matchstick_tensor_3d from){
+void assignment_matchstick_tensor_3d(matchstick_tensor_3d to,matchstick_tensor_3d from){
 	to->t=from->t;
 }

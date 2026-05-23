@@ -13,7 +13,7 @@ extern "C"{
 
 	typedef struct matchstick_tensor_4d_impl*matchstick_tensor_4d;
 
-	matchstick_tensor_4d init_matcistick_tensor_4d(size_t b,size_t c,size_t h,size_t w,float*v);
+	matchstick_tensor_4d init_matchstick_tensor_4d(size_t b,size_t c,size_t h,size_t w,float*v);
 
 	void free_matchstick_tensor_4d(matchstick_tensor_4d a);
 
@@ -25,7 +25,7 @@ extern "C"{
 
 	size_t get_width_matchstick_tensor_4d(matchstick_tensor_4d a);
 
-	void assignment_matcistich_tensor_4d(matchstick_tensor_4d to,matchstick_tensor_4d from);
+	void assignment_matchstich_tensor_4d(matchstick_tensor_4d to,matchstick_tensor_4d from);
 
 #ifdef __cplusplus
 }

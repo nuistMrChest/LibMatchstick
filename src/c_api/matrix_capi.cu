@@ -1,7 +1,7 @@
 #include"matrix_capi.h"
 #include"iostream"
 
-matchstick_matrix init_matcistick_matrix(size_t h,size_t w,float*v){
+matchstick_matrix init_matchstick_matrix(size_t h,size_t w,float*v){
 	matchstick_matrix a=new matchstick_matrix_impl();
 	a->m=LibMatchstick::Matrix(h,w);
 	cudaMemcpy(a->m.getData(),v,h*w*sizeof(float),cudaMemcpyHostToDevice);
@@ -25,6 +25,6 @@ size_t get_width_matchstick_matrix(matchstick_matrix a){
 	return a->m.getWidth();
 }
 
-void assignment_matcistich_matrix(matchstick_matrix to,matchstick_matrix from){
+void assignment_matchstich_matrix(matchstick_matrix to,matchstick_matrix from){
 	to->m=from->m;
 }

@@ -13,7 +13,7 @@ extern "C"{
 
 	typedef matchstick_matrix_impl*matchstick_matrix;
 
-	matchstick_matrix init_matcistick_matrix(size_t h,size_t w,float*v);
+	matchstick_matrix init_matchstick_matrix(size_t h,size_t w,float*v);
 
 	void free_matchstick_matrix(matchstick_matrix a);
 
@@ -23,7 +23,7 @@ extern "C"{
 
 	size_t get_width_matchstick_matrix(matchstick_matrix a);
 
-	void assignment_matcistich_matrix(matchstick_matrix to,matchstick_matrix from);
+	void assignment_matchstich_matrix(matchstick_matrix to,matchstick_matrix from);
 
 #ifdef __cplusplus
 }

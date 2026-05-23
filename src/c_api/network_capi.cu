@@ -21,42 +21,42 @@ void set_layer_matchstick_mlp(matchstick_mlp a,size_t index,size_t in_size,size_
 
 void set_layer_activation_matchstick_mlp(matchstick_mlp a,size_t index,activation ac){
 	switch(ac){
-		case a_relu:
+		case matchstick_activation_relu:
 			a->m.setLayerActivation(
 				index,
 				LibMatchstick::Activation::relu,
 				LibMatchstick::Activation::relu_d
 			);
 			break;
-		case a_leaky_relu:
+		case matchstick_activation_leaky_relu:
 			a->m.setLayerActivation(
 				index,
 				LibMatchstick::Activation::leaky_relu,
 				LibMatchstick::Activation::leaky_relu_d
 			);
 			break;
-		case a_sigmoid:
+		case matchstick_activation_sigmoid:
 			a->m.setLayerActivation(
 				index,
 				LibMatchstick::Activation::sigmoid,
 				LibMatchstick::Activation::sigmoid_d
 			);
 			break;
-		case a_tanh:
+		case matchstick_activation_tanh:
 			a->m.setLayerActivation(
 				index,
 				LibMatchstick::Activation::tanh,
 				LibMatchstick::Activation::tanh_d
 			);
 			break;
-		case a_identity:
+		case matchstick_activation_identity:
 			a->m.setLayerActivation(
 				index,
 				LibMatchstick::Activation::identity,
 				LibMatchstick::Activation::identity_d
 			);
 			break;
-		case a_softmax:
+		case matchstick_activation_softmax:
 			a->m.setLayerActivation(
 				index,
 				LibMatchstick::Activation::softmax,
@@ -68,19 +68,19 @@ void set_layer_activation_matchstick_mlp(matchstick_mlp a,size_t index,activatio
 
 void set_loss_matchstick_mlp(matchstick_mlp a,loss l){
 	switch(l){
-		case l_mse:
+		case matchstick_loss_mse:
 			a->m.setLoss(
 				LibMatchstick::Loss::MSE,
 				LibMatchstick::Loss::MSE_d
 			);
 			break;
-		case l_mae:
+		case matchstick_loss_mae:
 			a->m.setLoss(
 				LibMatchstick::Loss::MAE,
 				LibMatchstick::Loss::MAE_d
 			);
 			break;
-		case l_ce:
+		case matchstick_loss_ce:
 			a->m.setLoss(
 				LibMatchstick::Loss::cross_entropy,
 				LibMatchstick::Loss::cross_entropy_d
@@ -89,7 +89,7 @@ void set_loss_matchstick_mlp(matchstick_mlp a,loss l){
 	}
 }
 
-float train_matchsticl_mlp(
+float train_matchstick_mlp(
 	matchstick_mlp a,
 	matchstick_matrix input,
 	matchstick_matrix expected,
@@ -132,7 +132,7 @@ matchstick_matrix save_bias_matchstick_mlp(matchstick_mlp a,size_t index){
 	return res;
 }
 
-void shuffle_matchstic_mlp(matchstick_mlp a,float high,float low){
+void shuffle_matchstick_mlp(matchstick_mlp a,float high,float low){
 	a->m.init(high,low);
 }
 
@@ -166,61 +166,61 @@ void set_layer_matchstick_cnn(
 
 void set_layer_activation_matchstick_cnn(matchstick_cnn a,size_t index,activation ac){
 	switch(ac){
-		case a_relu:
+		case matchstick_activation_relu:
 			a->c.setLayerActivation(
 				index,
 				LibMatchstick::Activation::relu_t,
 				LibMatchstick::Activation::relu_t_d
 			);
 			break;
-		case a_leaky_relu:
+		case matchstick_activation_leaky_relu:
 			a->c.setLayerActivation(
 				index,
 				LibMatchstick::Activation::leaky_relu_t,
 				LibMatchstick::Activation::leaky_relu_t_d
 			);
 			break;
-		case a_sigmoid:
+		case matchstick_activation_sigmoid:
 			a->c.setLayerActivation(
 				index,
 				LibMatchstick::Activation::sigmoid_t,
 				LibMatchstick::Activation::sigmoid_t_d
 			);
 			break;
-		case a_tanh:
+		case matchstick_activation_tanh:
 			a->c.setLayerActivation(
 				index,
 				LibMatchstick::Activation::tanh_t,
 				LibMatchstick::Activation::tanh_t_d
 			);
 			break;
-		case a_identity:
+		case matchstick_activation_identity:
 			a->c.setLayerActivation(
 				index,
 				LibMatchstick::Activation::identity_t,
 				LibMatchstick::Activation::identity_t_d
 			);
 			break;
-		case a_softmax:
+		case matchstick_activation_softmax:
 			break;
 	}
 }
 
 void set_loss_matchstick_cnn(matchstick_cnn a,loss l){
 	switch(l){
-		case l_mse:
+		case matchstick_loss_mse:
 			a->c.mlp().setLoss(
 				LibMatchstick::Loss::MSE,
 				LibMatchstick::Loss::MSE_d
 			);
 			break;
-		case l_mae:
+		case matchstick_loss_mae:
 			a->c.mlp().setLoss(
 				LibMatchstick::Loss::MAE,
 				LibMatchstick::Loss::MAE_d
 			);
 			break;
-		case l_ce:
+		case matchstick_loss_ce:
 			a->c.mlp().setLoss(
 				LibMatchstick::Loss::cross_entropy,
 				LibMatchstick::Loss::cross_entropy_d
@@ -259,7 +259,7 @@ float*save_bias_matchstick_cnn(matchstick_cnn a,size_t index,size_t out_c){
 	return tmp;
 }
 
-void shuffle_matchstic_cnn(matchstick_cnn a,float high,float low){
+void shuffle_matchstick_cnn(matchstick_cnn a,float high,float low){
 	a->c.init(high,low);
 }
 
@@ -269,42 +269,42 @@ void set_layer_matchstick_cnn_mlp(matchstick_cnn a,size_t index,size_t in_size,s
 
 void set_layer_activation_matchstick_cnn_mlp(matchstick_cnn a,size_t index,activation ac){
 	switch(ac){
-		case a_relu:
+		case matchstick_activation_relu:
 			a->c.mlp().setLayerActivation(
 				index,
 				LibMatchstick::Activation::relu,
 				LibMatchstick::Activation::relu_d
 			);
 			break;
-		case a_leaky_relu:
+		case matchstick_activation_leaky_relu:
 			a->c.mlp().setLayerActivation(
 				index,
 				LibMatchstick::Activation::leaky_relu,
 				LibMatchstick::Activation::leaky_relu_d
 			);
 			break;
-		case a_sigmoid:
+		case matchstick_activation_sigmoid:
 			a->c.mlp().setLayerActivation(
 				index,
 				LibMatchstick::Activation::sigmoid,
 				LibMatchstick::Activation::sigmoid_d
 			);
 			break;
-		case a_tanh:
+		case matchstick_activation_tanh:
 			a->c.mlp().setLayerActivation(
 				index,
 				LibMatchstick::Activation::tanh,
 				LibMatchstick::Activation::tanh_d
 			);
 			break;
-		case a_identity:
+		case matchstick_activation_identity:
 			a->c.mlp().setLayerActivation(
 				index,
 				LibMatchstick::Activation::identity,
 				LibMatchstick::Activation::identity_d
 			);
 			break;
-		case a_softmax:
+		case matchstick_activation_softmax:
 			a->c.mlp().setLayerActivation(
 				index,
 				LibMatchstick::Activation::softmax,

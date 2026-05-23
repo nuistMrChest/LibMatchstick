@@ -16,20 +16,20 @@ extern "C"{
 
 	typedef matchstick_mlp_impl*matchstick_mlp;
 
-	enum activation{
-		a_relu,
-		a_leaky_relu,
-		a_sigmoid,
-		a_tanh,
-		a_identity,
-		a_softmax
-	};
+	typedef enum{
+		matchstick_activation_relu,
+		matchstick_activation_leaky_relu,
+		matchstick_activation_sigmoid,
+		matchstick_activation_tanh,
+		matchstick_activation_identity,
+		matchstick_activation_softmax
+	}activation;
 
-	enum loss{
-		l_mse,
-		l_mae,
-		l_ce
-	};
+	typedef enum{
+		matchstick_loss_mse,
+		matchstick_loss_mae,
+		matchstick_loss_ce
+	}loss;
 
 	matchstick_mlp init_matchstick_mlp(size_t layer_size,float step);
 
@@ -41,7 +41,7 @@ extern "C"{
 
 	void set_loss_matchstick_mlp(matchstick_mlp a,loss l);
 
-	float train_matchsticl_mlp(
+	float train_matchstick_mlp(
 		matchstick_mlp a,
 		matchstick_matrix input,
 		matchstick_matrix expected,
@@ -62,7 +62,7 @@ extern "C"{
 
 	matchstick_matrix save_bias_matchstick_mlp(matchstick_mlp a,size_t index);
 
-	void shuffle_matchstic_mlp(matchstick_mlp a,float high,float low);
+	void shuffle_matchstick_mlp(matchstick_mlp a,float high,float low);
 
 
 	struct matchstick_cnn_impl;
@@ -107,7 +107,7 @@ extern "C"{
 
 	float*save_bias_matchstick_cnn(matchstick_cnn a,size_t index,size_t out_c);
 
-	void shuffle_matchstic_cnn(matchstick_cnn a,float high,float low);
+	void shuffle_matchstick_cnn(matchstick_cnn a,float high,float low);
 
 	void set_layer_matchstick_cnn_mlp(matchstick_cnn a,size_t index,size_t in_size,size_t out_size);
 

@@ -9,11 +9,11 @@ extern "C"{
 
 	struct matchstick_tensor_3d_impl;
 
-	typedef struct mmatchstick_tensor_3d_impl atchstick_tensor_3d_impl;
+	typedef struct matchstick_tensor_3d_impl matchstick_tensor_3d_impl;
 
 	typedef matchstick_tensor_3d_impl*matchstick_tensor_3d;
 
-	matchstick_tensor_3d init_matcistick_tensor_3d(size_t c,size_t h,size_t w,float*v);
+	matchstick_tensor_3d init_matchstick_tensor_3d(size_t c,size_t h,size_t w,float*v);
 
 	void free_matchstick_tensor_3d(matchstick_tensor_3d a);
 
@@ -25,7 +25,7 @@ extern "C"{
 
 	size_t get_width_matchstick_tensor_3d(matchstick_tensor_3d a);
 
-	void assignment_matcistick_tensor_3d(matchstick_tensor_3d to,matchstick_tensor_3d from);
+	void assignment_matchstick_tensor_3d(matchstick_tensor_3d to,matchstick_tensor_3d from);
 
 #ifdef __cplusplus
 }
