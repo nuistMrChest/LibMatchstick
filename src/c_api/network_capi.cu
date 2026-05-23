@@ -2,9 +2,9 @@
 #include"matrix_capi.h"
 #include"tensor_3d_capi.h"
 #include"tensor_4d_capi.h"
-#include"../../internal/activation.h"
-#include"../../internal/layer.h"
-#include"../../internal/loss.h"
+#include"../../include/matchstick/activation.h"
+#include"../../include/matchstick/layer.h"
+#include"../../include/matchstick/loss.h"
 
 matchstick_mlp init_matchstick_mlp(size_t layer_size,float step){
 	matchstick_mlp a=new matchstick_mlp_impl();
