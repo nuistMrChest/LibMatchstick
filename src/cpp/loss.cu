@@ -2,7 +2,7 @@
 #include"../../internal/matrix.h"
 
 namespace LibMatchstick{
-	namespace Losses{
+	namespace Loss{
 		float MSE(const Matrix&x,const Matrix&e){
 			float*tmp_x=(float*)malloc(x.getHeight()*x.getWidth()*sizeof(float));
 			cudaMemcpy(tmp_x,x.getData(),x.getHeight()*x.getWidth()*sizeof(float),cudaMemcpyDeviceToHost);
