@@ -3,6 +3,7 @@
 #include"tensor_3d_capi.h"
 #include"tensor_4d_capi.h"
 #include"../../internal/activation.h"
+#include"../../internal/layer.h"
 #include"../../internal/loss.h"
 
 matchstick_mlp init_matchstick_mlp(size_t layer_size,float step){
