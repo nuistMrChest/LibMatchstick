@@ -25,7 +25,7 @@ extern "C"{
 
 	size_t get_width_matchstick_tensor_4d(matchstick_tensor_4d a);
 
-	void assignment_matchstich_tensor_4d(matchstick_tensor_4d to,matchstick_tensor_4d from);
+	void assignment_matchstick_tensor_4d(matchstick_tensor_4d to,matchstick_tensor_4d from);
 
 #ifdef __cplusplus
 }

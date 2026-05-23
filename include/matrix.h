@@ -23,7 +23,7 @@ extern "C"{
 
 	size_t get_width_matchstick_matrix(matchstick_matrix a);
 
-	void assignment_matchstich_matrix(matchstick_matrix to,matchstick_matrix from);
+	void assignment_matchstick_matrix(matchstick_matrix to,matchstick_matrix from);
 
 #ifdef __cplusplus
 }

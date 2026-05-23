@@ -1,4 +1,4 @@
-#ifndef MATCISTICK_H
+#ifndef MATCHSTICK_H
 #define MATCHSTICK_H
 
 #include"matrix.h"
