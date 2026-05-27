@@ -39,7 +39,6 @@ set_target_properties(matchstick PROPERTIES
 	CUDA_SEPARABLE_COMPILATION ON
 	CUDA_RESOLVE_DEVICE_SYMBOLS ON
 
-	# 关键：静态链接 CUDA Runtime，也就是 libcudart_static.a
 	CUDA_RUNTIME_LIBRARY Static
 )
 
