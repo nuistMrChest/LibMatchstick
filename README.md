@@ -70,7 +70,7 @@ LibMatchstick/
 ├── LICENSE
 ├── COPYING
 ├── COPYING.LESSER
-├── CMakeLists.txt
+├── makefile
 └── README.md
 ```
 
