@@ -57,16 +57,23 @@ Recommended layout:
 ```text
 LibMatchstick/
 ├── include/
-│   ├── matrix.h
-│   ├── tensor_3d.h
-│   ├── tensor_4d.h
-│   ├── activation.h
-│   ├── losses.h
-│   ├── layer.h
-│   └── network.h
+│   ├── matchstick/
+│   │   ├ activation.h
+│   │   ├ loss.h
+│   │   ├ matrix.h
+│   │   ├ network.h
+│   │   ├ tensor_3d.h
+│   │   └ tensor_4d.h
+│   └── matchstick_c/
+│       ├ matchstick.h
+│       ├ matrix.h
+│       ├ network.h
+│       ├ tensor_3d.h
+│       └ tensor_4d.h
 ├── src/
 ├── docs/
-│   └── API.md
+│   ├── API.md
+│   └── API_C.md
 ├── LICENSE
 ├── COPYING
 ├── COPYING.LESSER
