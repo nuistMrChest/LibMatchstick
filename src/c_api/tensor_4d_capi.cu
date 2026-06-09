@@ -30,3 +30,7 @@ size_t get_width_matchstick_tensor_4d(matchstick_tensor_4d a){
 void assignment_matchstick_tensor_4d(matchstick_tensor_4d to,matchstick_tensor_4d from){
 	to->t=from->t;
 }
+
+float get_matchstick_tensor_4d(matchstick_tensor_4d a,size_t i,size_t j,size_t k,size_t l){
+	return a->t.get(i,j,k,l);
+}

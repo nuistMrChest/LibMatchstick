@@ -44,7 +44,7 @@ namespace LibMatchstick{
 
 	class CNN{
 	private:
-		std::vector<CNNLayer>layers;
+		std::vector<CNNLayer*>layers;
 		float step;
 		MLP m;
 	public:
@@ -52,7 +52,7 @@ namespace LibMatchstick{
 		CNN(size_t layer_size,float step,size_t mlp_layer_size,float mlp_step);
 		MLP&mlp();
 		const MLP&mlp()const;
-		void setLayer(
+		void setConvolutionLayer(
 			size_t index,
 			size_t in_c,
 			size_t in_h,
@@ -64,12 +64,22 @@ namespace LibMatchstick{
 			size_t k_h,
 			size_t k_w,
 			size_t s,
-			size_t p
-		);
-		void setLayerActivation(
-			size_t index,
+			size_t p,
 			std::function<Tensor3d(const Tensor3d&)>activation,
 			std::function<Tensor3d(const Tensor3d&)>activation_d
+		);
+		void setPoolingLayer(
+			size_t index,
+			size_t in_c,
+			size_t in_h,
+			size_t in_w,
+			size_t out_c,
+			size_t out_h,
+			size_t out_w,
+			size_t ker_h,
+			size_t ker_w,
+			size_t s,
+			size_t p
 		);
 		float train(const Tensor3d&input,const Matrix&expected);
 		Matrix use(const Tensor3d&input);
@@ -78,6 +88,7 @@ namespace LibMatchstick{
 		bool loadKernel(size_t index,const Tensor4d&k);
 		bool loadBias(size_t index,const std::vector<float>&b);
 		void init(float high=1,float low=-1);
+		~CNN();
 	};
 }
 

@@ -75,7 +75,7 @@ extern "C"{
 
 	void free_matchstick_cnn(matchstick_cnn a);
 
-	void set_layer_matchstick_cnn(
+	void set_convolution_layer_matchstick_cnn(
 		matchstick_cnn a,
 		size_t index,
 		size_t in_c,
@@ -88,10 +88,24 @@ extern "C"{
 		size_t k_h,
 		size_t k_w,
 		size_t s,
-		size_t p
+		size_t p,
+		activation ac
 	);
 
-	void set_layer_activation_matchstick_cnn(matchstick_cnn a,size_t index,activation ac);
+	void set_pooling_layer_matchstick_cnn(
+		matchstick_cnn a,
+		size_t index,
+		size_t in_c,
+		size_t in_h,
+		size_t in_w,
+		size_t out_c,
+		size_t out_h,
+		size_t out_w,
+		size_t ker_h,
+		size_t ker_w,
+		size_t s,
+		size_t p
+	);
 
 	void set_loss_matchstick_cnn(matchstick_cnn a,loss l);
 

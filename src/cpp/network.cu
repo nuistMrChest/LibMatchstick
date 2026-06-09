@@ -124,6 +124,7 @@ namespace LibMatchstick{
 		m(MLP(mlp_layer_size,mlp_step))
 	{
 		layers.resize(layer_size);
+		for(size_t i=0;i<layer_size;i++)layers[i]=nullptr;
 	}
 
 	MLP&CNN::mlp(){
@@ -134,7 +135,7 @@ namespace LibMatchstick{
 		return m;
 	}
 
-	void CNN::setLayer(
+	void CNN::setConvolutionLayer(
 		size_t index,
 		size_t in_c,
 		size_t in_h,
@@ -146,9 +147,11 @@ namespace LibMatchstick{
 		size_t k_h,
 		size_t k_w,
 		size_t s,
-		size_t p
+		size_t p,
+		std::function<Tensor3d(const Tensor3d&)>activation,
+		std::function<Tensor3d(const Tensor3d&)>activation_d
 	){
-		layers[index]=CNNLayer(
+		layers[index]=new CNNConvolutionLayer(
 			in_c,
 			in_h,
 			in_w,
@@ -159,16 +162,37 @@ namespace LibMatchstick{
 			k_h,
 			k_w,
 			s,
-			p
+			p,
+			activation,
+			activation_d
 		);
 	}
 
-	void CNN::setLayerActivation(
+	void CNN::setPoolingLayer(
 		size_t index,
-		std::function<Tensor3d(const Tensor3d&)>activation,
-		std::function<Tensor3d(const Tensor3d&)>activation_d
+		size_t in_c,
+		size_t in_h,
+		size_t in_w,
+		size_t out_c,
+		size_t out_h,
+		size_t out_w,
+		size_t ker_h,
+		size_t ker_w,
+		size_t s,
+		size_t p
 	){
-		layers[index].setActivation(activation,activation_d);
+		layers[index]=new CNNPoolingLayer(
+		in_c,
+		in_h,
+		in_w,
+		out_c,
+		out_h,
+		out_w,
+		ker_h,
+		ker_w,
+		s,
+		p
+		);
 	}
 
 	float CNN::train(const Tensor3d&input,const Matrix&expected){
@@ -176,20 +200,20 @@ namespace LibMatchstick{
 		Tensor3d last_input=input;
 		Tensor3d output;
 		for(size_t i=0;i<layers.size();i++){
-			output=layers[i].forward(last_input);
+			output=layers[i]->forward(last_input);
 			last_input=output;
 		}
 		Matrix m_l_dl_da;
 		res=m.train(output.flatten(),expected,m_l_dl_da);
 		Tensor3d last_dl_da=Tensor3d::deflatten(
 			m_l_dl_da,
-			layers.back().getOutChannel(),
-			layers.back().getOutHeight(),
-			layers.back().getOutWidth()
+			layers.back()->getOutChannel(),
+			layers.back()->getOutHeight(),
+			layers.back()->getOutWidth()
 		);
 		for(size_t i=0;i<layers.size();i++){
 			size_t j=layers.size()-1-i;
-			last_dl_da=layers[j].backward(last_dl_da,step);
+			last_dl_da=layers[j]->backward(last_dl_da,step);
 		}
 		return res;
 	}
@@ -198,32 +222,40 @@ namespace LibMatchstick{
 		Tensor3d last_input=input;
 		Tensor3d output;
 		for(size_t i=0;i<layers.size();i++){
-			output=layers[i].forward(last_input);
+			output=layers[i]->forward(last_input);
 			last_input=output;
 		}
 		return m.use(output.flatten());
 	}
 
 	Tensor4d CNN::saveKernel(size_t index)const{
-		return layers[index].saveKernel();
+		if(layers[index]->getType()==CNNLayerType::Convolution)return layers[index]->saveKernel();
+		else return Tensor4d();
 	}
 
 	std::vector<float>CNN::saveBias(size_t index)const{
-		return layers[index].saveBias();
+		if(layers[index]->getType()==CNNLayerType::Convolution)return layers[index]->saveBias();
+		else return std::vector<float>();
 	}
 
 	bool CNN::loadKernel(size_t index,const Tensor4d&k){
-		return layers[index].loadKernel(k);
+		if(layers[index]->getType()==CNNLayerType::Convolution)return layers[index]->loadKernel(k);
+		else return false;
 	}
 
 	bool CNN::loadBias(size_t index,const std::vector<float>&b){
-		return layers[index].loadBias(b);
+		if(layers[index]->getType()==CNNLayerType::Convolution)return layers[index]->loadBias(b);
+		else return false;
 	}
 
 	void CNN::init(float high,float low){
 		for(size_t i=0;i<layers.size();i++)
-			layers[i].init(high,low);
+			layers[i]->init(high,low);
 		m.init(high,low);
+	}
+
+	CNN::~CNN(){
+		for(size_t i=0;i<layers.size();i++)delete layers[i];
 	}
 }
 

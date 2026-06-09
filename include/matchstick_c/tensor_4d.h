@@ -1,6 +1,7 @@
 #ifndef TENSOR_4D_C_H
 #define TENSOR_4D_C_H
 
+#include "tensor_3d.h"
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -26,6 +27,8 @@ extern "C"{
 	size_t get_width_matchstick_tensor_4d(matchstick_tensor_4d a);
 
 	void assignment_matchstick_tensor_4d(matchstick_tensor_4d to,matchstick_tensor_4d from);
+
+	float get_matchstick_tensor_4d(matchstick_tensor_4d a,size_t i,size_t j,size_t k,size_t l);
 
 #ifdef __cplusplus
 }

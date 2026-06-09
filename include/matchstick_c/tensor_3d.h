@@ -27,6 +27,8 @@ extern "C"{
 
 	void assignment_matchstick_tensor_3d(matchstick_tensor_3d to,matchstick_tensor_3d from);
 
+	float get_matchstick_tensor_3d(matchstick_tensor_3d a,size_t i,size_t j,size_t k);
+
 #ifdef __cplusplus
 }
 #endif

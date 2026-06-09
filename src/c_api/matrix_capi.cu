@@ -28,3 +28,7 @@ size_t get_width_matchstick_matrix(matchstick_matrix a){
 void assignment_matchstick_matrix(matchstick_matrix to,matchstick_matrix from){
 	to->m=from->m;
 }
+
+float get_matchstick_matrix(matchstick_matrix a,size_t i,size_t j){
+	return a->m.get(i,j);
+}

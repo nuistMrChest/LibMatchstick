@@ -25,6 +25,8 @@ extern "C"{
 
 	void assignment_matchstick_matrix(matchstick_matrix to,matchstick_matrix from);
 
+	float get_matchstick_matrix(matchstick_matrix a,size_t i,size_t j);
+
 #ifdef __cplusplus
 }
 #endif

@@ -3,10 +3,12 @@
 #include"../../include/matchstick/activation.h"
 #include"../../include/matchstick/tensor_3d.h"
 #include"../../include/matchstick/tensor_4d.h"
+#include <__clang_cuda_runtime_wrapper.h>
 #include<algorithm>
 #include<cstdio>
 #include<memory>
 #include<random>
+#include<cfloat>
 
 namespace LibMatchstick{
 	MLPLayer::MLPLayer():
@@ -110,22 +112,206 @@ namespace LibMatchstick{
 		sm=true;
 	}
 
-	CNNLayer::CNNLayer():
-		b(nullptr),
-		in_c(0),
-		in_h(0),
-		in_w(0),
-		out_c(0),
-		out_h(0),
-		out_w(0),
-		stride(0),
-		padding(0)
+	CNNLayerType CNNLayer::getType(){
+		return type;
+	}
+
+	CNNPoolingLayer::CNNPoolingLayer():
+		k_h(0),
+		k_w(0)
 	{
+		in_c=0; 
+		in_h=0; 
+		in_w=0; 
+		out_c=0; 
+		out_h=0; 
+		out_w=0; 
+		stride=0; 
+		padding=0; 
+		type=CNNLayerType::Pooling;
+	}
+
+	CNNConvolutionLayer::CNNConvolutionLayer():
+		b(nullptr)
+	{
+		in_c=0; 
+		in_h=0; 
+		in_w=0; 
+		out_c=0; 
+		out_h=0; 
+		out_w=0; 
+		stride=0; 
+		padding=0; 
+		type=CNNLayerType::Convolution;
 		activation=Activation::identity_t;
 		activation_d=Activation::identity_t_d;
 	}
 
-	CNNLayer::CNNLayer(
+
+	CNNPoolingLayer::CNNPoolingLayer(
+		size_t in_c,
+		size_t in_h,
+		size_t in_w,
+		size_t out_c,
+		size_t out_h,
+		size_t out_w,
+		size_t ker_h,
+		size_t ker_w,
+		size_t s,
+		size_t p
+	):
+		k_h(ker_h),
+		k_w(ker_w)
+	{
+		this->in_c=in_c;
+		this->in_h=in_h;
+		this->in_w=in_w;
+		this->out_c=out_c;
+		this->out_h=out_h;
+		this->out_w=out_w;
+		stride=s;
+		padding=p;
+		type=CNNLayerType::Pooling;
+		saved_max=std::make_unique<Tensor4d>(out_c,2,out_h,out_w);
+	}
+
+	static void __global__ max(
+		float*res,
+		const float*ten,
+		float*savk,
+		size_t r_c,
+		size_t r_h,
+		size_t r_w,
+		size_t stride,
+		size_t padding,
+		size_t k_h,
+		size_t k_w,
+		size_t t_c,
+		size_t t_h,
+		size_t t_w
+	){
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
+		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
+		float max=-FLT_MAX;
+		if(i<r_c&&j<r_h&&k<r_w){
+			res[r_h*r_w*i+r_w*j+k]=0;
+			size_t x=j*stride;
+			size_t y=k*stride;
+			size_t s_i;
+			size_t s_j;
+			for(size_t jj=0;jj<k_h;jj++)
+				for(size_t kk=0;kk<k_w;kk++)
+					if(
+						!(
+							(long long)(x+jj)-
+							(long long)padding<
+							0||
+							(long long)(y+kk)-
+							(long long)(padding)<
+							0||
+							(long long)(x+jj)-
+							(long long)(padding)>=
+							(long long)(t_h)||
+							(long long)(y+kk)-
+							(long long)(padding)>=
+							(long long)(t_w)
+						)
+					)
+						if(ten[i*t_h*t_w+(x+jj-padding)*t_w+(y+kk-padding)]>max){
+							max=ten[i*t_h*t_w+(x+jj-padding)*t_w+(y+kk-padding)];
+							s_i=x+jj-padding;
+							s_j=y+kk-padding;
+						}
+			res[r_h*r_w*i+r_w*j+k]=max;
+			const size_t s_c=2;
+			const size_t s_h=r_h;
+			const size_t s_w=r_w;
+			savk[i*s_c*s_h*s_w+0*s_h*s_w+j*s_w+k]=s_i;
+			savk[i*s_c*s_h*s_w+1*s_h*s_w+j*s_w+k]=s_j;
+		}
+	}
+
+	Tensor3d CNNPoolingLayer::forward(const Tensor3d&input){
+		Tensor3d res;
+		if(input.getChannel()==in_c&&input.getHeight()==in_h&&input.getWidth()==in_w){
+			res.resize(
+				input.getChannel(),
+				(input.getHeight()+2*padding-k_h)/stride+1,
+				(input.getWidth()+2*padding-k_w)/stride+1
+			);
+			dim3 block(8,8,8);
+			dim3 grid(
+				(res.getChannel()+block.x-1)/block.x,
+				(res.getHeight()+block.y-1)/block.y,
+				(res.getWidth()+block.z-1)/block.z
+			);
+			max<<<grid,block>>>(
+				res.getData(),
+				input.getData(),
+				saved_max->getData(),
+				res.getChannel(),
+				res.getHeight(),
+				res.getWidth(),
+				stride,
+				padding,
+				k_h,
+				k_w,
+				input.getChannel(),
+				input.getHeight(),
+				input.getWidth()
+			);
+		}
+		return res;
+	}
+
+	static void __global__ pass_grad(
+		float*res,
+		const float*grad,
+		const float*savk,
+		size_t r_h,
+		size_t r_w,
+		size_t g_c,
+		size_t g_h,
+		size_t g_w
+	){
+		size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+		size_t j=blockIdx.y*blockDim.y+threadIdx.y;
+		size_t k=blockIdx.z*blockDim.z+threadIdx.z;
+		if(i<g_c&&j<g_h&&k<g_w){
+			const size_t s_c=2;
+			const size_t s_h=g_h;
+			const size_t s_w=g_w;
+			const size_t r_i=i;
+			const size_t r_j=savk[i*s_c*s_h*s_w+0*s_h*s_w+j*s_w+k];
+			const size_t r_k=savk[i*s_c*s_h*s_w+1*s_h*s_w+j*s_w+k];
+			res[r_i*r_h*r_w+r_j*r_w+r_k]=grad[i*g_h*g_w+j*g_w+k];
+		}
+	}
+
+	Tensor3d CNNPoolingLayer::backward(const Tensor3d&dl_da,float step){
+		Tensor3d res(in_c,in_h,in_w);
+		cudaMemset(res.getData(),0,in_c*in_h*in_w*sizeof(float));
+		dim3 block(8,8,8);
+		dim3 grid(
+			(out_c+block.x-1)/block.x,
+			(out_h+block.y-1)/block.y,
+			(out_w+block.z-1)/block.z
+		);
+		pass_grad<<<grid,block>>>(
+			res.getData(),
+			dl_da.getData(),
+			saved_max->getData(),
+			in_h,
+			in_w,
+			out_c,
+			out_h,
+			out_w
+		);
+		return res;
+	}
+
+	CNNConvolutionLayer::CNNConvolutionLayer(
 		size_t in_c,
 		size_t in_h,
 		size_t in_w,
@@ -136,26 +322,30 @@ namespace LibMatchstick{
 		size_t k_h,
 		size_t k_w,
 		size_t s,
-		size_t p
-	):
-		in_c(in_c),
-		in_h(in_h),
-		in_w(in_w),
-		out_c(out_c),
-		out_h(out_h),
-		out_w(out_w),
-		stride(s),
-		padding(p)
+		size_t p,
+		const std::function<Tensor3d(const Tensor3d&)>&a,
+		const std::function<Tensor3d(const Tensor3d&)>&a_d
+	)
 	{
+		this->in_c=in_c;
+		this->in_h=in_h;
+		this->in_w=in_w;
+		this->out_c=out_c;
+		this->out_h=out_h;
+		this->out_w=out_w;
+		stride=s;
+		padding=p;
+		type=CNNLayerType::Convolution;
 		cudaMalloc(&b,out_c*sizeof(float));
 		kernel=std::make_unique<Tensor4d>(out_c,k_c,k_h,k_w);
 		last_input=std::make_unique<Tensor3d>(in_c,in_h,in_w);
 		z=std::make_unique<Tensor3d>(out_c,out_h,out_w);
 		activation=Activation::identity_t;
 		activation_d=Activation::identity_t_d;
+		setActivation(a,a_d);
 	}
 
-	void CNNLayer::init(float high,float low){
+	void CNNConvolutionLayer::init(float high,float low){
 		float*tmp_k=(float*)malloc(
 			kernel->getBatch()*
 			kernel->getChannel()*
@@ -197,7 +387,7 @@ namespace LibMatchstick{
 			res[i*o_h*o_w+j*o_w+k]+=b[i];
 	}
 
-	Tensor3d CNNLayer::forward(const Tensor3d&input){
+	Tensor3d CNNConvolutionLayer::forward(const Tensor3d&input){
 		Tensor3d res;
 		if(input.getChannel()==in_c&&input.getHeight()==in_h&&in_w==input.getWidth()){
 			*last_input=input;
@@ -324,7 +514,7 @@ namespace LibMatchstick{
 					b[i]-=step*dl_dz[i*o_h*o_w+j*o_w+k];
 	}
 
-	Tensor3d CNNLayer::backward(const Tensor3d&dl_da,float step){
+	Tensor3d CNNConvolutionLayer::backward(const Tensor3d&dl_da,float step){
 		Tensor3d res(in_c,in_h,in_w);
 		cudaMemset(res.getData(),0,in_c*in_h*in_w*sizeof(float));
 		Tensor3d dl_dz=dl_da.hadamard(activation_d(*z));
@@ -377,17 +567,17 @@ namespace LibMatchstick{
 		return res;
 	}
 
-	Tensor4d CNNLayer::saveKernel()const{
+	Tensor4d CNNConvolutionLayer::saveKernel()const{
 		return*kernel;
 	}
 
-	std::vector<float>CNNLayer::saveBias()const{
+	std::vector<float>CNNConvolutionLayer::saveBias()const{
 		float*tmp=(float*)malloc(out_c*sizeof(float));
 		cudaMemcpy(tmp,b,out_c*sizeof(float),cudaMemcpyDeviceToHost);
 		return std::vector<float>(tmp,tmp+out_c);
 	}
 
-	bool CNNLayer::loadKernel(const Tensor4d&k){
+	bool CNNConvolutionLayer::loadKernel(const Tensor4d&k){
 		if(
 			kernel->getBatch()==k.getBatch()&&
 			kernel->getChannel()==k.getChannel()&&
@@ -400,13 +590,13 @@ namespace LibMatchstick{
 		return false;
 	}
 
-	bool CNNLayer::loadBias(const std::vector<float>&b){
+	bool CNNConvolutionLayer::loadBias(const std::vector<float>&b){
 		if(b.size()!=out_c)return false;
 		cudaMemcpy(this->b,b.data(),out_c*sizeof(float),cudaMemcpyHostToDevice);
 		return true;
 	}
 
-	void CNNLayer::setActivation(
+	void CNNConvolutionLayer::setActivation(
 		const std::function<Tensor3d(const Tensor3d&)>&a,
 		const std::function<Tensor3d(const Tensor3d&)>&a_d
 	){
@@ -414,11 +604,11 @@ namespace LibMatchstick{
 		activation_d=a_d;
 	}
 
-	CNNLayer::~CNNLayer(){
+	CNNConvolutionLayer::~CNNConvolutionLayer(){
 		cudaFree(b);
 	}
 
-	CNNLayer::CNNLayer(const CNNLayer&a){
+	CNNConvolutionLayer::CNNConvolutionLayer(const CNNConvolutionLayer&a){
 		activation=a.activation;
 		activation_d=a.activation_d;
 		kernel=std::make_unique<Tensor4d>(*a.kernel);
@@ -436,7 +626,7 @@ namespace LibMatchstick{
 		cudaMemcpy(b,a.b,out_c*sizeof(float),cudaMemcpyDeviceToDevice);
 	}
 
-	CNNLayer&CNNLayer::operator=(const CNNLayer&a){
+	CNNConvolutionLayer&CNNConvolutionLayer::operator=(const CNNConvolutionLayer&a){
 		activation=a.activation;
 		activation_d=a.activation_d;
 		kernel=std::make_unique<Tensor4d>(*a.kernel);

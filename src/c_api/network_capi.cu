@@ -147,7 +147,7 @@ void free_matchstick_cnn(matchstick_cnn a){
 	delete a;
 }
 
-void set_layer_matchstick_cnn(
+void set_convolution_layer_matchstick_cnn(
 	matchstick_cnn a,
 	size_t index,
 	size_t in_c,
@@ -160,44 +160,36 @@ void set_layer_matchstick_cnn(
 	size_t k_h,
 	size_t k_w,
 	size_t s,
-	size_t p
+	size_t p,
+	activation ac
 ){
-	a->c.setLayer(index,in_c,in_h,in_w,out_c,out_h,out_w,k_c,k_h,k_w,s,p);
-}
-
-void set_layer_activation_matchstick_cnn(matchstick_cnn a,size_t index,activation ac){
 	switch(ac){
 		case matchstick_activation_relu:
-			a->c.setLayerActivation(
-				index,
+			a->c.setConvolutionLayer(index,in_c,in_h,in_w,out_c,out_h,out_w,k_c,k_h,k_w,s,p,
 				LibMatchstick::Activation::relu_t,
 				LibMatchstick::Activation::relu_t_d
 			);
 			break;
 		case matchstick_activation_leaky_relu:
-			a->c.setLayerActivation(
-				index,
+			a->c.setConvolutionLayer(index,in_c,in_h,in_w,out_c,out_h,out_w,k_c,k_h,k_w,s,p,
 				LibMatchstick::Activation::leaky_relu_t,
 				LibMatchstick::Activation::leaky_relu_t_d
 			);
 			break;
 		case matchstick_activation_sigmoid:
-			a->c.setLayerActivation(
-				index,
+			a->c.setConvolutionLayer(index,in_c,in_h,in_w,out_c,out_h,out_w,k_c,k_h,k_w,s,p,
 				LibMatchstick::Activation::sigmoid_t,
 				LibMatchstick::Activation::sigmoid_t_d
 			);
 			break;
 		case matchstick_activation_tanh:
-			a->c.setLayerActivation(
-				index,
+			a->c.setConvolutionLayer(index,in_c,in_h,in_w,out_c,out_h,out_w,k_c,k_h,k_w,s,p,
 				LibMatchstick::Activation::tanh_t,
 				LibMatchstick::Activation::tanh_t_d
 			);
 			break;
 		case matchstick_activation_identity:
-			a->c.setLayerActivation(
-				index,
+			a->c.setConvolutionLayer(index,in_c,in_h,in_w,out_c,out_h,out_w,k_c,k_h,k_w,s,p,
 				LibMatchstick::Activation::identity_t,
 				LibMatchstick::Activation::identity_t_d
 			);
@@ -206,6 +198,36 @@ void set_layer_activation_matchstick_cnn(matchstick_cnn a,size_t index,activatio
 			break;
 	}
 }
+
+void set_pooling_layer_matchstick_cnn(
+	matchstick_cnn a,
+	size_t index,
+	size_t in_c,
+	size_t in_h,
+	size_t in_w,
+	size_t out_c,
+	size_t out_h,
+	size_t out_w,
+	size_t ker_h,
+	size_t ker_w,
+	size_t s,
+	size_t p
+){
+	a->c.setPoolingLayer(
+		index,
+		in_c,
+		in_h,
+		in_w,
+		out_c,
+		out_h,
+		out_w,
+		ker_h,
+		ker_w,
+		s,
+		p
+	);
+}
+
 
 void set_loss_matchstick_cnn(matchstick_cnn a,loss l){
 	switch(l){
