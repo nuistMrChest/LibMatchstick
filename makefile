@@ -57,6 +57,18 @@ $(OBJ_DIR)/tensor_3d_capi.o:$(CAPI)/tensor_3d_capi.cu $(CAPI)/tensor_3d_capi.h $
 $(OBJ_DIR)/tensor_4d_capi.o:$(CAPI)/tensor_4d_capi.cu $(CAPI)/tensor_4d_capi.h $(CINCLUDE)/tensor_4d.h $(CPPINCLUDE)/tensor_4d.h|OBJ
 	nvcc $(CUDAFLAGS) -c $(CAPI)/tensor_4d_capi.cu -o $(OBJ_DIR)/tensor_4d_capi.o
 
+clean:
+	rm -rf ./obj
+	rm -rf ./build
+
+install:all
+	sudo cp ./build/libmatchstick.so /usr/local/lib
+	sudo cp -r ./include/* /usr/local/include
+
+uninstall:
+	sudo rm /usr/local/lib/libmatchstick.so
+	sudo rm -rf /usr/local/include/matchstick
+	sudo rm -rf /usr/local/include/matchstick_c
 
 
 
