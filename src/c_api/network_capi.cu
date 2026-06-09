@@ -7,9 +7,7 @@
 #include"../../include/matchstick/loss.h"
 
 matchstick_mlp init_matchstick_mlp(size_t layer_size,float step){
-	matchstick_mlp a=new matchstick_mlp_impl();
-	a->m=LibMatchstick::MLP(layer_size,step);
-	return a;
+	return new matchstick_mlp_impl(layer_size, step);
 }
 
 void free_matchstick_mlp(matchstick_mlp a){
@@ -138,9 +136,7 @@ void shuffle_matchstick_mlp(matchstick_mlp a,float high,float low){
 }
 
 matchstick_cnn init_matchstick_cnn(size_t layer_size,float step,size_t mlp_layer_size,float mlp_step){
-	matchstick_cnn a=new matchstick_cnn_impl();
-	a->c=LibMatchstick::CNN(layer_size,step,mlp_layer_size,mlp_step);
-	return a;
+	return new matchstick_cnn_impl(layer_size, step, mlp_layer_size, mlp_step);
 }
 
 void free_matchstick_cnn(matchstick_cnn a){

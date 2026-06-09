@@ -229,28 +229,29 @@ namespace LibMatchstick{
 	}
 
 	Tensor4d CNN::saveKernel(size_t index)const{
-		if(layers[index]->getType()==CNNLayerType::Convolution)return layers[index]->saveKernel();
+		if(layers[index]->getType()==CNNLayerType::Convolution)return static_cast<CNNConvolutionLayer*>(layers[index])->saveKernel();
 		else return Tensor4d();
 	}
 
 	std::vector<float>CNN::saveBias(size_t index)const{
-		if(layers[index]->getType()==CNNLayerType::Convolution)return layers[index]->saveBias();
+		if(layers[index]->getType()==CNNLayerType::Convolution)return static_cast<CNNConvolutionLayer*>(layers[index])->saveBias();
 		else return std::vector<float>();
 	}
 
 	bool CNN::loadKernel(size_t index,const Tensor4d&k){
-		if(layers[index]->getType()==CNNLayerType::Convolution)return layers[index]->loadKernel(k);
+		if(layers[index]->getType()==CNNLayerType::Convolution)return static_cast<CNNConvolutionLayer*>(layers[index])->loadKernel(k);
 		else return false;
 	}
 
 	bool CNN::loadBias(size_t index,const std::vector<float>&b){
-		if(layers[index]->getType()==CNNLayerType::Convolution)return layers[index]->loadBias(b);
+		if(layers[index]->getType()==CNNLayerType::Convolution)return static_cast<CNNConvolutionLayer*>(layers[index])->loadBias(b);
 		else return false;
 	}
 
 	void CNN::init(float high,float low){
 		for(size_t i=0;i<layers.size();i++)
-			layers[i]->init(high,low);
+			if(layers[i]->getType()==CNNLayerType::Convolution)
+			static_cast<CNNConvolutionLayer*>(layers[i])->init(high,low);
 		m.init(high,low);
 	}
 

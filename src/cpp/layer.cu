@@ -3,7 +3,6 @@
 #include"../../include/matchstick/activation.h"
 #include"../../include/matchstick/tensor_3d.h"
 #include"../../include/matchstick/tensor_4d.h"
-#include <__clang_cuda_runtime_wrapper.h>
 #include<algorithm>
 #include<cstdio>
 #include<memory>
