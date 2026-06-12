@@ -2,7 +2,7 @@
 #define NETWORK_C_H
 
 #ifdef __cplusplus
-extern "C"{
+extern"C"{
 #endif
 
 #include<stddef.h>

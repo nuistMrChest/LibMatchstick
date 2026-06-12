@@ -2,10 +2,10 @@
 #define MATRIX_C_H
 
 #ifdef __cplusplus
-extern "C"{
+extern"C"{
 #endif
 
-	#include<stddef.h>
+#include<stddef.h>
 
 	struct matchstick_matrix_impl;
 

@@ -1,12 +1,12 @@
 #ifndef TENSOR_4D_C_H
 #define TENSOR_4D_C_H
 
-#include "tensor_3d.h"
+#include"tensor_3d.h"
 #ifdef __cplusplus
-extern "C"{
+extern"C"{
 #endif
 
-	#include<stddef.h>
+#include<stddef.h>
 
 	struct matchstick_tensor_4d_impl;
 

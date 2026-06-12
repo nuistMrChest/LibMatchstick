@@ -2,10 +2,10 @@
 #define TENSOR_3D_C_H
 
 #ifdef __cplusplus
-extern "C"{
+extern"C"{
 #endif
 
-	#include<stddef.h>
+#include<stddef.h>
 
 	struct matchstick_tensor_3d_impl;
 
