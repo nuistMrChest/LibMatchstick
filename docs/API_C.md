@@ -197,6 +197,16 @@ The two matrices should have compatible dimensions.
 
 ---
 
+## 3.7 `get_matchstick_matrix`
+
+```c
+float get_matchstick_matrix(matchstick_matrix a, size_t i, size_t j);
+```
+
+Returns the matrix element at row `i` and column `j`.
+
+---
+
 # 4. Tensor 3D API
 
 Header:
@@ -340,6 +350,16 @@ The two tensors should have compatible dimensions.
 
 ---
 
+## 4.8 `get_matchstick_tensor_3d`
+
+```c
+float get_matchstick_tensor_3d(matchstick_tensor_3d a, size_t i, size_t j, size_t k);
+```
+
+Returns the tensor element at `(i, j, k)`.
+
+---
+
 # 5. Tensor 4D API
 
 Header:
@@ -470,6 +490,16 @@ void assignment_matchstick_tensor_4d(
 Assigns the contents of `from` to `to`.
 
 The two tensors should have compatible dimensions.
+
+---
+
+## 5.8 `get_matchstick_tensor_4d`
+
+```c
+float get_matchstick_tensor_4d(matchstick_tensor_4d a, size_t i, size_t j, size_t k, size_t l);
+```
+
+Returns the tensor element at `(i, j, k, l)`.
 
 ---
 
@@ -890,10 +920,10 @@ Releases a CNN object.
 
 ---
 
-## 8.3 `set_layer_matchstick_cnn`
+## 8.3 `set_convolution_layer_matchstick_cnn`
 
 ```c
-void set_layer_matchstick_cnn(
+void set_convolution_layer_matchstick_cnn(
     matchstick_cnn a,
     size_t index,
     size_t in_c,
@@ -906,18 +936,19 @@ void set_layer_matchstick_cnn(
     size_t k_h,
     size_t k_w,
     size_t s,
-    size_t p
+    size_t p,
+    activation ac
 );
 ```
 
-Configures one convolution layer.
+Configures one convolution layer and sets its activation function.
 
 Parameters:
 
 | Parameter | Description |
 |---|---|
 | `a` | CNN object |
-| `index` | Convolution layer index |
+| `index` | CNN layer index |
 | `in_c` | Input channel count |
 | `in_h` | Input height |
 | `in_w` | Input width |
@@ -929,34 +960,45 @@ Parameters:
 | `k_w` | Kernel width |
 | `s` | Stride |
 | `p` | Padding |
+| `ac` | Activation enum value |
 
 Example:
 
 ```c
-set_layer_matchstick_cnn(
+set_convolution_layer_matchstick_cnn(
     cnn,
     0,
     1, 28, 28,
     8, 24, 24,
     1, 5, 5,
     1,
-    0
+    0,
+    matchstick_activation_relu
 );
 ```
 
 ---
 
-## 8.4 `set_layer_activation_matchstick_cnn`
+## 8.4 `set_pooling_layer_matchstick_cnn`
 
 ```c
-void set_layer_activation_matchstick_cnn(
+void set_pooling_layer_matchstick_cnn(
     matchstick_cnn a,
     size_t index,
-    activation ac
+    size_t in_c,
+    size_t in_h,
+    size_t in_w,
+    size_t out_c,
+    size_t out_h,
+    size_t out_w,
+    size_t ker_h,
+    size_t ker_w,
+    size_t s,
+    size_t p
 );
 ```
 
-Sets the activation function of one convolution layer.
+Configures one pooling layer.
 
 ---
 
@@ -1344,7 +1386,7 @@ int main(void) {
         0.01f
     );
 
-    set_layer_matchstick_cnn(
+    set_convolution_layer_matchstick_cnn(
         cnn,
         0,
         1, 28, 28,

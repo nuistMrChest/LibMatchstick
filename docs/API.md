@@ -31,6 +31,8 @@ This document describes the public API declared in the current header files:
 - [Layers](#layers)
   - [`MLPLayer`](#mlplayer)
   - [`CNNLayer`](#cnnlayer)
+  - [`CNNConvolutionLayer`](#cnnconvolutionlayer)
+  - [`CNNPoolingLayer`](#cnnpoolinglayer)
 - [Networks](#networks)
   - [`MLP`](#mlp)
   - [`CNN`](#cnn)
@@ -1396,29 +1398,63 @@ Full name:
 LibMatchstick::CNNLayer
 ```
 
-`CNNLayer` represents a convolution layer.
+`CNNLayer` is the abstract base class for CNN layers. It is not meant to be instantiated directly. The current concrete layer classes are:
 
-Internally, the layer stores:
+- `CNNConvolutionLayer`
+- `CNNPoolingLayer`
 
-- Convolution kernel
-- Bias values
-- Activation function
-- Activation derivative
-- Last input
-- Linear output `z`
-- Input shape
-- Output shape
-- Stride
-- Padding
+The base class stores common metadata such as layer type, input shape, output shape, stride, and padding.
+
+Public base API:
+
+```cpp
+enum class CNNLayerType {
+    Convolution,
+    Pooling
+};
+
+virtual Tensor3d forward(const Tensor3d& input) = 0;
+virtual Tensor3d backward(const Tensor3d& dl_da, float step) = 0;
+
+CNNLayerType getType();
+size_t getOutChannel() const;
+size_t getOutHeight() const;
+size_t getOutWidth() const;
+~CNNLayer() = default;
+```
+
+### `getType`
+
+Returns whether the layer is a convolution layer or a pooling layer.
+
+### Output Shape Query
+
+```cpp
+size_t getOutChannel() const;
+size_t getOutHeight() const;
+size_t getOutWidth() const;
+```
+
+Returns the output channel count, output height, and output width.
 
 ---
 
-## Constructors and Destructor
+## `CNNConvolutionLayer`
+
+Full name:
 
 ```cpp
-CNNLayer();
+LibMatchstick::CNNConvolutionLayer
+```
 
-CNNLayer(
+`CNNConvolutionLayer` is the concrete convolution layer. It owns the kernel, bias, cached input, cached pre-activation output, and activation functions.
+
+Constructors and destructor:
+
+```cpp
+CNNConvolutionLayer();
+
+CNNConvolutionLayer(
     size_t in_c,
     size_t in_h,
     size_t in_w,
@@ -1429,40 +1465,33 @@ CNNLayer(
     size_t k_h,
     size_t k_w,
     size_t s,
-    size_t p
+    size_t p,
+    const std::function<Tensor3d(const Tensor3d&)>& a,
+    const std::function<Tensor3d(const Tensor3d&)>& a_d
 );
 
-~CNNLayer();
+~CNNConvolutionLayer();
 ```
 
-### `CNNLayer()`
+Public API:
 
-Creates an empty convolution layer.
+```cpp
+void init(float high = 1, float low = -1);
+Tensor4d saveKernel() const;
+std::vector<float> saveBias() const;
+bool loadKernel(const Tensor4d& k);
+bool loadBias(const std::vector<float>& b);
 
-### Parameterized Constructor
+void setActivation(
+    const std::function<Tensor3d(const Tensor3d&)>& a,
+    const std::function<Tensor3d(const Tensor3d&)>& a_d
+);
 
-Creates a convolution layer.
+CNNConvolutionLayer(const CNNConvolutionLayer& a);
+CNNConvolutionLayer& operator=(const CNNConvolutionLayer& a);
 
-Parameters:
-
-| Parameter | Description |
-|---|---|
-| `in_c` | Input channel count |
-| `in_h` | Input height |
-| `in_w` | Input width |
-| `out_c` | Output channel count |
-| `out_h` | Output height |
-| `out_w` | Output width |
-| `k_c` | Kernel channel count |
-| `k_h` | Kernel height |
-| `k_w` | Kernel width |
-| `s` | Stride |
-| `p` | Padding |
-
-Usually:
-
-```text
-k_c == in_c
+Tensor3d forward(const Tensor3d& input);
+Tensor3d backward(const Tensor3d& dl_da, float step);
 ```
 
 For standard convolution, output spatial size is usually:
@@ -1472,147 +1501,47 @@ out_h = floor((in_h + 2 * padding - k_h) / stride) + 1
 out_w = floor((in_w + 2 * padding - k_w) / stride) + 1
 ```
 
-The current API asks the caller to provide `out_h` and `out_w` explicitly, so the caller should ensure that the values are consistent with the convolution formula.
+The current API asks the caller to provide `out_h` and `out_w` explicitly, so the caller should ensure that these values are consistent with the convolution formula.
 
 ---
 
-## Forward Propagation
+## `CNNPoolingLayer`
+
+Full name:
 
 ```cpp
-Tensor3d forward(const Tensor3d& input);
+LibMatchstick::CNNPoolingLayer
 ```
 
-Runs forward propagation for the convolution layer.
+`CNNPoolingLayer` is the concrete pooling layer. It stores the pooling kernel size and the saved max-position information used by backpropagation.
 
-Parameters:
-
-| Parameter | Description |
-|---|---|
-| `input` | Input feature map, usually `in_c x in_h x in_w` |
-
-Returns a `Tensor3d`, usually with shape:
-
-```text
-out_c x out_h x out_w
-```
-
----
-
-## Backward Propagation
+Constructors:
 
 ```cpp
-Tensor3d backward(const Tensor3d& dl_da, float step);
-```
+CNNPoolingLayer();
 
-Runs backpropagation and updates the kernel and bias.
-
-Parameters:
-
-| Parameter | Description |
-|---|---|
-| `dl_da` | Gradient of loss with respect to this layer's activation output |
-| `step` | Learning rate |
-
-Returns the gradient passed to the previous layer, usually with shape:
-
-```text
-in_c x in_h x in_w
-```
-
----
-
-## Initialization
-
-```cpp
-void init(float high = 1, float low = -1);
-```
-
-Initializes kernels and biases.
-
-Parameters:
-
-| Parameter | Description |
-|---|---|
-| `high` | Upper bound of initialization range |
-| `low` | Lower bound of initialization range |
-
----
-
-## Save and Load Parameters
-
-```cpp
-Tensor4d saveKernel() const;
-std::vector<float> saveBias() const;
-
-bool loadKernel(const Tensor4d& k);
-bool loadBias(const std::vector<float>& b);
-```
-
-### `saveKernel`
-
-Returns a copy of the convolution kernel.
-
-### `saveBias`
-
-Returns a copy of the bias vector.
-
-### `loadKernel`
-
-Loads the convolution kernel.
-
-Returns `true` on success and `false` on failure, depending on the implementation.
-
-### `loadBias`
-
-Loads the bias vector.
-
-Returns `true` on success and `false` on failure, depending on the implementation.
-
----
-
-## Set Activation Function
-
-```cpp
-void setActivation(
-    const std::function<Tensor3d(const Tensor3d&)>& a,
-    const std::function<Tensor3d(const Tensor3d&)>& a_d
+CNNPoolingLayer(
+    size_t in_c,
+    size_t in_h,
+    size_t in_w,
+    size_t out_c,
+    size_t out_h,
+    size_t out_w,
+    size_t ker_h,
+    size_t ker_w,
+    size_t s,
+    size_t p
 );
 ```
 
-Sets the activation function and its derivative.
-
-Example:
+Public API:
 
 ```cpp
-using namespace LibMatchstick::Activation;
-
-CNNLayer layer(/* ... */);
-
-layer.setActivation(relu_t, relu_t_d);
+Tensor3d forward(const Tensor3d& input);
+Tensor3d backward(const Tensor3d& dl_da, float step);
 ```
 
----
-
-## Copy and Assignment
-
-```cpp
-CNNLayer(const CNNLayer& a);
-CNNLayer& operator=(const CNNLayer& a);
-```
-
-`CNNLayer` supports copy construction and copy assignment.
-
----
-
-## Output Shape Query
-
-```cpp
-size_t getOutChannel() const;
-size_t getOutHeight() const;
-size_t getOutWidth() const;
-```
-
-Returns the output channel count, output height, and output width.
+For pooling layers, `ker_h` and `ker_w` are the pooling window size. The current API also asks the caller to provide `out_c`, `out_h`, and `out_w` explicitly, so the caller should keep them consistent with the pooling geometry.
 
 ---
 
@@ -1945,7 +1874,7 @@ net.mlp().setLayer(1, 128, 10);
 ## Set Convolution Layer
 
 ```cpp
-void setLayer(
+void setConvolutionLayer(
     size_t index,
     size_t in_c,
     size_t in_h,
@@ -1957,7 +1886,9 @@ void setLayer(
     size_t k_h,
     size_t k_w,
     size_t s,
-    size_t p
+    size_t p,
+    std::function<Tensor3d(const Tensor3d&)> activation,
+    std::function<Tensor3d(const Tensor3d&)> activation_d
 );
 ```
 
@@ -1987,46 +1918,47 @@ CNN net(2, 0.001f, 2, 0.01f);
 
 // Input: 1 x 28 x 28
 // Output: 8 x 14 x 14
-net.setLayer(
+net.setConvolutionLayer(
     0,
     1, 28, 28,
     8, 14, 14,
     1, 3, 3,
-    2, 1
+    2, 1,
+    relu_t, relu_t_d
 );
 
 // Output: 16 x 7 x 7
-net.setLayer(
+net.setConvolutionLayer(
     1,
     8, 14, 14,
     16, 7, 7,
     8, 3, 3,
-    2, 1
+    2, 1,
+    relu_t, relu_t_d
 );
 ```
 
 ---
 
-## Set Convolution Layer Activation
+## Set Pooling Layer
 
 ```cpp
-void setLayerActivation(
+void setPoolingLayer(
     size_t index,
-    std::function<Tensor3d(const Tensor3d&)> activation,
-    std::function<Tensor3d(const Tensor3d&)> activation_d
+    size_t in_c,
+    size_t in_h,
+    size_t in_w,
+    size_t out_c,
+    size_t out_h,
+    size_t out_w,
+    size_t ker_h,
+    size_t ker_w,
+    size_t s,
+    size_t p
 );
 ```
 
-Sets the activation function and derivative for a convolution layer.
-
-Example:
-
-```cpp
-using namespace LibMatchstick::Activation;
-
-net.setLayerActivation(0, relu_t, relu_t_d);
-net.setLayerActivation(1, relu_t, relu_t_d);
-```
+Sets a pooling layer.
 
 ---
 
@@ -2190,7 +2122,7 @@ int main() {
 
     // Input shape: 1 x 28 x 28
     // First convolution layer: 1 x 28 x 28 -> 8 x 14 x 14
-    net.setLayer(
+    net.setConvolutionLayer(
         0,
         1, 28, 28,
         8, 14, 14,
@@ -2199,7 +2131,7 @@ int main() {
     );
 
     // Second convolution layer: 8 x 14 x 14 -> 16 x 7 x 7
-    net.setLayer(
+    net.setConvolutionLayer(
         1,
         8, 14, 14,
         16, 7, 7,
@@ -2361,7 +2293,7 @@ Do not train before configuring the network structure, activations, and loss fun
 Example:
 
 ```cpp
-net.setLayer(
+net.setConvolutionLayer(
     0,
     1, 28, 28,
     8, 14, 14,
