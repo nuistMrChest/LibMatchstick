@@ -22,7 +22,7 @@ OBJ:
 	mkdir -p $(OBJ_DIR)
 
 $(BUILD_DIR)/libmatchstick.so:$(OBJS)|BUILD OBJ
-	nvcc -shared $(OBJS) -o $(BUILD_DIR)/libmatchstick.so
+	nvcc -shared $(OBJS) -cudart=static -Xcompiler -static-libstdc++ -Xcompiler -static-libgcc -o $(BUILD_DIR)/libmatchstick.so
 
 $(OBJ_DIR)/activation.o:$(CPP)/activation.cu $(CPPINCLUDE)/activation.h|OBJ
 	nvcc $(CUDAFLAGS) -c $(CPP)/activation.cu -o $(OBJ_DIR)/activation.o
