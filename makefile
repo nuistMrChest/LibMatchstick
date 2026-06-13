@@ -1,7 +1,7 @@
 BUILD_DIR=./build
 OBJ_DIR=./obj
 
-CUDAFLAGS=-O2 -ccbin /usr/bin/gcc-15 -Xcompiler -fPIC
+CUDAFLAGS=-O2 -Xcompiler -fPIC
 
 CPP=./src/cpp
 
