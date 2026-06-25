@@ -110,7 +110,7 @@ A common make build flow is:
 
 ```bash
 make
-make instal 
+make install
 ```
 
 The generated library is usually placed somewhere under the `build/` directory, depending on the current `makefile`.
