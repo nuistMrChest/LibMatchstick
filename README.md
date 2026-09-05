@@ -1,5 +1,7 @@
 # LibMatchstick
 
+![logo](./logo.png)
+
 LibMatchstick is a lightweight C++ / CUDA neural network library.
 
 It is designed as a small self-contained framework for learning, experimentation, and course projects. The library currently focuses on basic neural network components, especially MLP and CNN workflows, while keeping the API relatively simple and explicit.
